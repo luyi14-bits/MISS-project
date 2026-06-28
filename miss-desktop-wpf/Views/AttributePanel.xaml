@@ -1,0 +1,222 @@
+<UserControl x:Class="MISS.Views.AttributePanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border x:Name="RootBorder" Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0"
+            Width="200">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid Margin="12,14">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="属性调节" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextBrush}" Margin="0,0,0,12"/>
+
+                <StackPanel x:Name="SlidersPanel" Grid.Row="1">
+
+                    <!-- 1. rational_emotional -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="理性/情绪" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.RationalEmotional, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="-100" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.RationalEmotional, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    </Grid>
+
+                    <!-- 2. willpower -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="意志力" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.Willpower, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="-100" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.Willpower, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    </Grid>
+
+                    <!-- 3. independent_submissive -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="独立/顺从" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.IndependentSubmissive, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="-100" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.IndependentSubmissive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    </Grid>
+
+                    <!-- 4. education_level -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="文化水平" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.EducationLevel, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="-100" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.EducationLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"
+                                ValueChanged="EducationLevel_ValueChanged"/>
+                    </Grid>
+
+                    <!-- 5. intimacy -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="亲密度" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.Intimacy, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="0" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.Intimacy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    </Grid>
+
+                    <!-- 6. curiosity -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="好奇心" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.Curiosity, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="-100" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.Curiosity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    </Grid>
+
+                    <!-- 7. humor -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="幽默感" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.Humor, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="-100" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.Humor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    </Grid>
+
+                    <!-- 8. aggression -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="攻击性" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.Aggression, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="-100" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.Aggression, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    </Grid>
+
+                    <!-- 9. social_energy -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="社交活力" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.SocialEnergy, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="-100" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.SocialEnergy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    </Grid>
+
+                    <!-- 10. adventurousness -->
+                    <Grid Margin="0,3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="冒险精神" FontSize="11"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="  " FontSize="11"/>
+                            <TextBlock Text="{Binding CurrentRole.Profile.Adventurousness, FallbackValue=0}"
+                                       FontSize="11" Foreground="{DynamicResource PrimaryBrush}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Slider Grid.Row="1" Minimum="-100" Maximum="100"
+                                Value="{Binding CurrentRole.Profile.Adventurousness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="20" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    </Grid>
+
+                </StackPanel>
+
+                <!-- Intimacy display -->
+                <Border Grid.Row="2" Background="{DynamicResource PrimaryLightBrush}"
+                        CornerRadius="6" Padding="10,8" Margin="0,8,0,0">
+                    <StackPanel>
+                        <TextBlock FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}">亲密度</TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding CurrentRole.Profile.Intimacy, FallbackValue=50}"
+                                       FontSize="22" FontWeight="Bold"
+                                       Foreground="{DynamicResource PrimaryBrush}"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock x:Name="IntimacyChangeText" Text="" FontSize="12"
+                                       Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Bottom"
+                                       Margin="6,0,0,2"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Border>
+</UserControl>

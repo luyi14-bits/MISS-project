@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>MISS</AssemblyName>
+    <RootNamespace>MISS</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\*.jpg"/>
+    <Content Include="Resources\Images\*.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="pythonnet" Version="3.*"/>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*"/>
+    <PackageReference Include="Microsoft.ML.Tokenizers" Version="1.*"/>
+    <PackageReference Include="Microsoft.ML.Tokenizers.Data.O200kBase" Version="1.*"/>
+    <PackageReference Include="LiteDB" Version="5.*"/>
+  </ItemGroup>
+</Project>

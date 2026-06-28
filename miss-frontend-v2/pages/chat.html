@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISS AI Companion</title>
+    <style id="theme-vars">
+/* ── MISS v2 Design Tokens ── */
+/* Café au Lait 暖色主调 + 二次元轻量装饰 + ⑨模式冰蓝联动 */
+
+:root {
+  /* ══ 主色调 ══ */
+  --color-primary: #D4786E;
+  --color-primary-hover: #C05A4E;
+  --color-primary-light: #FBE5E0;
+  --color-primary-muted: #F5E0DC;
+
+  /* ══ 中性色 ══ */
+  --color-bg: #FDF8F0;
+  --color-surface: #FFFBFA;
+  --color-surface-alt: #F5EDE3;
+  --color-border: #E8DDD4;
+  --color-text: #4A3728;
+  --color-text-secondary: #8B7355;
+  --color-text-muted: #C8BBA8;
+
+  /* ══ 消息气泡 ══ */
+  --color-user-bubble: #F0E6DA;
+  --color-miss-bubble: #FBE5E0;
+
+  /* ══ 状态色 ══ */
+  --state-success: #7BA587;
+  --state-warning: #D4A857;
+  --state-error: #C05A4E;
+
+  /* ══ ⑨模式色（默认隐藏） ══ */
+  --color-cirno-blue: #00BFFF;
+  --color-cirno-light: #87CEEB;
+  --color-cirno-bg: #F0F8FF;
+  --color-cirno-surface: #F5FAFE;
+  --color-cirno-border: #B8E0F0;
+  --color-cirno-text: #2A4A5A;
+  --color-cirno-text-secondary: #5A8A9A;
+  --color-cirno-bubble: #E0F0FA;
+
+  /* ══ 圆角 ══ */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* ══ 阴影 ══ */
+  --shadow-sm: 0 1px 3px rgba(74, 55, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(74, 55, 40, 0.08);
+  --shadow-lg: 0 8px 24px rgba(74, 55, 40, 0.10);
+  --shadow-float: 0 4px 16px rgba(74, 55, 40, 0.12);
+
+  /* ══ 字型 ══ */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 11px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+
+  /* ══ 动效 ══ */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 0.15s;
+  --duration-normal: 0.25s;
+  --duration-slow: 0.35s;
+}
+
+/* ══ ⑨模式 全局主题切换 ══ */
+:root[data-theme="cirno"] {
+  --color-primary: var(--color-cirno-blue);
+  --color-primary-hover: #0099CC;
+  --color-primary-light: #D0F0FF;
+  --color-primary-muted: #B8E8FF;
+  --color-bg: var(--color-cirno-bg);
+  --color-surface: var(--color-cirno-surface);
+  --color-surface-alt: #E8F4FC;
+  --color-border: var(--color-cirno-border);
+  --color-text: var(--color-cirno-text);
+  --color-text-secondary: var(--color-cirno-text-secondary);
+  --color-text-muted: #8AB8C8;
+  --color-user-bubble: #E8F4FC;
+  --color-miss-bubble: var(--color-cirno-bubble);
+}
+
+/* ══ 排版工具类 ══ */
+.text-caption { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+.text-body { font-size: var(--font-size-base); color: var(--color-text); line-height: 1.55; }
+.text-heading { font-size: var(--font-size-md); font-weight: 600; color: var(--color-text); }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-surface); color: var(--color-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="flex h-screen overflow-hidden" style="background:var(--color-bg);color:var(--color-text);">
+
+<!-- ═══════════════════ 侧边栏 ═══════════════════ -->
+<aside id="sidebar" class="flex flex-col overflow-hidden relative z-10 shrink-0 transition-all" style="width:180px;min-width:180px;background:var(--color-surface-alt);border-right:1px solid var(--color-border);transition-duration:var(--duration-normal);transition-timing-function:var(--ease-out);">
+
+  <button id="sidebarToggle" class="absolute w-6 h-6 flex items-center justify-center cursor-pointer z-10" style="top:10px;right:8px;border:none;background:none;color:var(--color-text-secondary);border-radius:var(--radius-sm);" onclick="toggleSidebar()" title="折叠/展开">
+    <i data-lucide="panel-left" class="w-4 h-4"></i>
+  </button>
+
+  <!-- 展开状态内容 -->
+  <div id="sidebarExpanded" class="flex flex-col h-full">
+    <div class="px-2.5 pb-2 overflow-hidden" style="padding-top:40px;">
+      <div class="flex justify-between items-center mb-1.5" style="font-size:var(--font-size-sm);font-weight:600;color:var(--color-text-secondary);letter-spacing:0.5px;white-space:nowrap;">
+        <span>会话</span>
+        <button onclick="addSession()" class="cursor-pointer whitespace-nowrap" style="font-size:var(--font-size-xs);padding:4px 10px;border:1px solid var(--color-border);border-radius:5px;background:var(--color-surface);color:var(--color-text-secondary);">+ 新建</button>
+      </div>
+      <div class="sidebar-item active" data-sid="s1" onclick="switchSession(this,'今天的闲聊')">
+        <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:var(--color-primary);"></span>
+        <span class="truncate">今天的闲聊</span>
+      </div>
+      <div class="sidebar-item" data-sid="s2" onclick="switchSession(this,'昨天的讨论')">
+        <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:var(--state-success);"></span>
+        <span class="truncate">昨天的讨论</span>
+      </div>
+      <div class="sidebar-item" data-sid="s3" onclick="switchSession(this,'属性调试')">
+        <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:var(--state-warning);"></span>
+        <span class="truncate">属性调试</span>
+      </div>
+    </div>
+
+    <div class="mx-2.5 h-px" style="background:var(--color-border);"></div>
+
+    <div class="px-2.5 pb-2 overflow-hidden flex-1" style="padding-top:12px;">
+      <div class="flex justify-between items-center mb-1.5" style="font-size:var(--font-size-sm);font-weight:600;color:var(--color-text-secondary);letter-spacing:0.5px;white-space:nowrap;">
+        <span>预设</span>
+        <div class="flex gap-1">
+          <button onclick="toastMsg('预设已保存')" class="cursor-pointer" style="font-size:var(--font-size-xs);padding:4px 6px;border:1px solid var(--color-border);border-radius:5px;background:var(--color-surface);color:var(--color-text-secondary);">⭐</button>
+          <button onclick="toastMsg('请选择 .json 文件')" class="cursor-pointer" style="font-size:var(--font-size-xs);padding:4px 6px;border:1px solid var(--color-border);border-radius:5px;background:var(--color-surface);color:var(--color-text-secondary);">📂</button>
+        </div>
+      </div>
+      <!-- 预设卡片 -->
+      <div class="preset-card" data-preset="傲娇女友" onclick="applyPresetByName(this)" oncontextmenu="showContextMenu(event, this)">
+        <img src="../assets/avatar-preset-tsundere.jpg" alt="傲娇女友" class="w-6 h-6 rounded-full object-cover shrink-0" style="border:1.5px solid var(--color-primary-light);box-shadow:0 1px 3px rgba(74,55,40,0.08);">
+        <span class="truncate">傲娇女友</span>
+        <div class="preset-tooltip">
+          <span class="tooltip-pill" style="background:#F5E0DC;color:#C05A4E;">顺从 -100</span>
+          <span class="tooltip-pill" style="background:#FBE5E0;color:#C05A4E;">亲密 100</span>
+          <span class="tooltip-pill" style="background:#FFF0E8;color:#D4A857;">攻击 40</span>
+          <span class="tooltip-pill" style="background:#FFF0E8;color:#D4786E;">情绪 60</span>
+        </div>
+      </div>
+      <div class="preset-card" data-preset="知性姐姐" onclick="applyPresetByName(this)" oncontextmenu="showContextMenu(event, this)">
+        <img src="../assets/avatar-preset-intellectual.jpg" alt="知性姐姐" class="w-6 h-6 rounded-full object-cover shrink-0" style="border:1.5px solid var(--color-primary-light);box-shadow:0 1px 3px rgba(74,55,40,0.08);">
+        <span class="truncate">知性姐姐</span>
+        <div class="preset-tooltip">
+          <span class="tooltip-pill" style="background:#E8E0F0;color:#6B5B8A;">文化 90</span>
+          <span class="tooltip-pill" style="background:#E0F0E8;color:#5A8A6B;">好奇 80</span>
+          <span class="tooltip-pill" style="background:#F5E0DC;color:#C05A4E;">幽默 40</span>
+          <span class="tooltip-pill" style="background:#E8F0FA;color:#5A7A9A;">社交 30</span>
+        </div>
+      </div>
+      <div class="preset-card" data-preset="笨蛋⑨" onclick="applyPresetByName(this)" oncontextmenu="showContextMenu(event, this)">
+        <img src="../assets/avatar-preset-baka.jpg" alt="笨蛋⑨" class="w-6 h-6 rounded-full object-cover shrink-0" style="border:1.5px solid var(--color-primary-light);box-shadow:0 1px 3px rgba(74,55,40,0.08);">
+        <span class="truncate">笨蛋⑨</span>
+        <div class="preset-tooltip">
+          <span class="tooltip-pill" style="background:#D0F0FF;color:#00BFFF;">文化 -100</span>
+          <span class="tooltip-pill" style="background:#E0F0E8;color:#5A8A6B;">好奇 100</span>
+          <span class="tooltip-pill" style="background:#FFF0E8;color:#D4A857;">幽默 60</span>
+          <span class="tooltip-pill" style="background:#E8F0FA;color:#5A7A9A;">社交 30</span>
+        </div>
+      </div>
+      <div class="preset-card" data-preset="冰山美人" onclick="applyPresetByName(this)" oncontextmenu="showContextMenu(event, this)">
+        <img src="../assets/avatar-preset-icequeen.jpg" alt="冰山美人" class="w-6 h-6 rounded-full object-cover shrink-0" style="border:1.5px solid var(--color-primary-light);box-shadow:0 1px 3px rgba(74,55,40,0.08);">
+        <span class="truncate">冰山美人</span>
+        <div class="preset-tooltip">
+          <span class="tooltip-pill" style="background:#E8ECF0;color:#5A6A7A;">理智 -100</span>
+          <span class="tooltip-pill" style="background:#E8ECF0;color:#5A6A7A;">攻击 -100</span>
+          <span class="tooltip-pill" style="background:#E8ECF0;color:#5A6A7A;">顺从 -100</span>
+          <span class="tooltip-pill" style="background:#E8ECF0;color:#5A6A7A;">社交 -100</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-auto px-2 pb-2 text-center" style="font-size:var(--font-size-xs);color:var(--color-text-muted);line-height:1.5;letter-spacing:0.5px;white-space:nowrap;border-top:1px solid var(--color-border);padding-top:10px;">
+      luyi14og 出品<br>开源项目
+    </div>
+  </div>
+
+  <!-- 折叠状态标签 -->
+  <div id="sidebarCollapsed" class="hidden flex-col items-center" style="padding-top:44px;gap:14px;">
+    <span style="writing-mode:vertical-rl;font-size:10px;color:var(--color-text-muted);letter-spacing:2px;">会话</span>
+    <span style="writing-mode:vertical-rl;font-size:10px;color:var(--color-text-muted);letter-spacing:2px;">预设</span>
+  </div>
+</aside>
+
+<!-- ═══════════════════ 聊天区 ═══════════════════ -->
+<div class="flex-1 flex flex-col min-w-0">
+  <!-- 工具栏 -->
+  <div class="flex items-center gap-4 px-4 flex-shrink-0" style="padding-top:10px;padding-bottom:10px;border-bottom:1px solid var(--color-border);font-size:var(--font-size-sm);">
+    <span id="sessionTitle" class="font-semibold flex-1 truncate" style="font-size:var(--font-size-md);color:var(--color-text);">今天的闲聊</span>
+    <label class="flex items-center gap-1.5 cursor-pointer" style="color:var(--color-text-secondary);font-size:var(--font-size-sm);">
+      <input type="checkbox" id="showInner" onchange="toggleAllInner()" style="accent-color:var(--color-primary);"> 内心独白
+    </label>
+    <label class="flex items-center gap-1.5 cursor-pointer" style="color:var(--color-text-secondary);font-size:var(--font-size-sm);">
+      <input type="checkbox" id="streamMode" checked style="accent-color:var(--color-primary);"> 流式
+    </label>
+  </div>
+
+  <!-- 消息区 -->
+  <div id="chatMsgs" class="flex-1 overflow-y-auto px-5 flex flex-col" style="padding-top:16px;padding-bottom:16px;gap:10px;">
+
+    <!-- 空状态 -->
+    <div id="emptyState" class="flex flex-col items-center justify-center h-full" style="gap:16px;">
+      <div class="flex flex-col items-center" style="gap:24px;">
+        <div class="relative" style="width:100px;height:100px;">
+          <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle, var(--color-primary-light) 0%, transparent 70%);opacity:0.5;"></div>
+          <div class="absolute rounded-full" style="top:8px;left:50%;margin-left:-2px;width:4px;height:4px;background:var(--color-primary);opacity:0.6;animation:sparkleFloat 2s ease-in-out infinite;"></div>
+          <div class="absolute rounded-full" style="top:20px;right:20px;width:3px;height:3px;background:var(--state-warning);opacity:0.5;animation:sparkleFloat 2.5s ease-in-out 0.5s infinite;"></div>
+          <div class="absolute rounded-full" style="bottom:25px;left:18px;width:3px;height:3px;background:var(--color-primary);opacity:0.4;animation:sparkleFloat 3s ease-in-out 1s infinite;"></div>
+          <img src="../assets/avatar-miss-default.jpg" alt="MISS" class="w-full h-full rounded-full object-cover" style="border:2px solid var(--color-primary-light);box-shadow:0 2px 8px rgba(74,55,40,0.08);">
+        </div>
+        <div class="flex flex-col items-center" style="gap:8px;">
+          <span class="text-center" style="font-size:var(--font-size-lg);font-weight:600;color:var(--color-text);">和 MISS 开始一段对话吧 ✦</span>
+          <span style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">选择一个预设角色，或直接发送消息</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 输入区 -->
+  <div class="flex items-center gap-2 px-4 flex-shrink-0 relative" style="padding-top:10px;padding-bottom:10px;border-top:1px solid var(--color-border);">
+    <button class="emoji-picker-btn flex items-center justify-center cursor-pointer shrink-0" onclick="toggleEmojiPanel()" title="表情" style="width:34px;height:34px;border:none;background:none;font-size:18px;border-radius:var(--radius-md);">
+      <i data-lucide="smile" class="w-5 h-5" style="color:var(--color-text-secondary);"></i>
+    </button>
+    <button class="flex items-center justify-center cursor-pointer shrink-0" onclick="simulateImageUpload()" title="发送图片" style="width:34px;height:34px;border:1px solid var(--color-border);border-radius:50%;background:none;font-size:16px;color:var(--color-text-secondary);">
+      <i data-lucide="image" class="w-4 h-4"></i>
+    </button>
+    <input type="text" id="msgInput" placeholder="输入消息，按 Enter 发送..." onkeydown="if(event.key==='Enter')sendMsg()" class="flex-1 px-3.5 outline-none" style="padding-top:10px;padding-bottom:10px;border:1px solid var(--color-border);border-radius:var(--radius-xl);font-size:var(--font-size-base);background:var(--color-surface);color:var(--color-text);font-family:var(--font-sans);">
+    <button id="sendBtn" onclick="sendMsg()" class="cursor-pointer font-medium transition-colors shrink-0" style="padding:10px 20px;border:none;border-radius:var(--radius-xl);background:var(--color-primary);color:#fff;font-size:var(--font-size-base);transition-duration:var(--duration-normal);transition-timing-function:var(--ease-out);">发送</button>
+
+    <!-- 表情面板 -->
+    <div id="emojiPanel" class="emoji-panel hidden flex-wrap absolute z-[100]" style="bottom:56px;left:16px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:10px;box-shadow:0 4px 16px rgba(74,55,40,0.12);padding:8px;width:280px;gap:2px;">
+      <span class="emoji-item" onclick="insertEmoji('😊')">😊</span><span class="emoji-item" onclick="insertEmoji('😂')">😂</span><span class="emoji-item" onclick="insertEmoji('❤️')">❤️</span><span class="emoji-item" onclick="insertEmoji('🥰')">🥰</span><span class="emoji-item" onclick="insertEmoji('😭')">😭</span><span class="emoji-item" onclick="insertEmoji('😡')">😡</span><span class="emoji-item" onclick="insertEmoji('👍')">👍</span><span class="emoji-item" onclick="insertEmoji('😎')">😎</span>
+      <span class="emoji-item" onclick="insertEmoji('🤔')">🤔</span><span class="emoji-item" onclick="insertEmoji('😴')">😴</span><span class="emoji-item" onclick="insertEmoji('🎉')">🎉</span><span class="emoji-item" onclick="insertEmoji('💪')">💪</span><span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span><span class="emoji-item" onclick="insertEmoji('🌈')">🌈</span><span class="emoji-item" onclick="insertEmoji('💖')">💖</span><span class="emoji-item" onclick="insertEmoji('✨')">✨</span>
+      <span class="emoji-item" onclick="insertEmoji('😅')">😅</span><span class="emoji-item" onclick="insertEmoji('🙏')">🙏</span><span class="emoji-item" onclick="insertEmoji('🤗')">🤗</span><span class="emoji-item" onclick="insertEmoji('💔')">💔</span><span class="emoji-item" onclick="insertEmoji('🌹')">🌹</span><span class="emoji-item" onclick="insertEmoji('💡')">💡</span><span class="emoji-item" onclick="insertEmoji('🏆')">🏆</span><span class="emoji-item" onclick="insertEmoji('🎵')">🎵</span>
+      <span class="emoji-item" onclick="insertEmoji('☀️')">☀️</span><span class="emoji-item" onclick="insertEmoji('🌙')">🌙</span><span class="emoji-item" onclick="insertEmoji('🍰')">🍰</span><span class="emoji-item" onclick="insertEmoji('☕')">☕</span><span class="emoji-item" onclick="insertEmoji('🎮')">🎮</span><span class="emoji-item" onclick="insertEmoji('📚')">📚</span><span class="emoji-item" onclick="insertEmoji('🎨')">🎨</span><span class="emoji-item" onclick="insertEmoji('🐱')">🐱</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 属性面板 ═══════════════════ -->
+<aside class="flex flex-col px-3 overflow-y-auto shrink-0" style="width:195px;min-width:195px;background:var(--color-surface);border-left:1px solid var(--color-border);padding-top:14px;padding-bottom:14px;">
+
+  <!-- ⑨模式徽章 -->
+  <div id="cirnoBadge" class="cirno-badge hidden text-center mb-2.5 px-2 py-1 rounded-md font-semibold text-white" style="font-size:var(--font-size-xs);background:linear-gradient(135deg, var(--color-cirno-light), var(--color-cirno-blue));">
+    <span class="cirno-sparkle">❄</span> ⑨模式 已激活 <span class="cirno-sparkle">❄</span>
+  </div>
+
+  <div class="text-center font-semibold mb-3.5" style="font-size:var(--font-size-sm);color:var(--color-text);">属性调节</div>
+
+  <div id="attrContainer">
+    <div class="attr-row">
+      <div class="attr-label">理智←→情绪<span class="attr-dirty-dot" id="d_rational_emotional"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="rational_emotional" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="rational_emotional" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">意志力<span class="attr-dirty-dot" id="d_willpower"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="willpower" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="willpower" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">独立←→顺从<span class="attr-dirty-dot" id="d_independent_submissive"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="independent_submissive" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="independent_submissive" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">文化水平<span class="attr-dirty-dot" id="d_education_level"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" id="sl_education_level" min="-100" max="100" value="0" data-attr="education_level" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="education_level" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">亲密度<span class="attr-dirty-dot" id="d_intimacy"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider intimacy-slider" min="0" max="100" value="0" data-attr="intimacy" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="0" max="100" value="0" data-attr="intimacy" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">好奇心<span class="attr-dirty-dot" id="d_curiosity"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="curiosity" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="curiosity" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">幽默感<span class="attr-dirty-dot" id="d_humor"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="humor" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="humor" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">攻击性<span class="attr-dirty-dot" id="d_aggression"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="aggression" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="aggression" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">社交能量<span class="attr-dirty-dot" id="d_social_energy"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="social_energy" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="social_energy" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">冒险精神<span class="attr-dirty-dot" id="d_adventurousness"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="adventurousness" oninput="onSlider(this)">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="adventurousness" onchange="onNumInput(this)" onkeydown="if(event.key==='Enter')this.blur()">
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-1.5" style="margin-top:10px;">
+    <button class="flex-1 cursor-pointer font-medium transition-colors" onclick="resetAll()" style="padding:7px 0;border:none;border-radius:var(--radius-md);font-size:var(--font-size-sm);background:var(--color-surface-alt);color:var(--color-text-secondary);">重置</button>
+    <button class="flex-1 cursor-pointer font-medium transition-colors" onclick="applyProfile()" style="padding:7px 0;border:none;border-radius:var(--radius-md);font-size:var(--font-size-sm);background:var(--color-primary);color:#fff;">应用</button>
+  </div>
+</aside>
+
+</main>
+
+<!-- ═══════════════════ 右键菜单 ═══════════════════ -->
+<div id="ctxMenu" class="context-menu fixed z-[1000] hidden p-1" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);box-shadow:var(--shadow-float);min-width:130px;">
+  <div onclick="applyPresetFromMenu()" class="px-3 py-1.5 cursor-pointer rounded" style="font-size:var(--font-size-sm);color:var(--color-text);">应用</div>
+  <div onclick="toastMsg('已导出 JSON')" class="px-3 py-1.5 cursor-pointer rounded" style="font-size:var(--font-size-sm);color:var(--color-text);">导出 JSON</div>
+  <div class="danger px-3 py-1.5 cursor-pointer rounded" onclick="toastMsg('预设已删除')" style="font-size:var(--font-size-sm);color:var(--state-error);">删除</div>
+</div>
+
+<!-- ═══════════════════ 图片预览弹窗 ═══════════════════ -->
+<div id="imgOverlay" class="hidden fixed inset-0 z-[3000] flex items-center justify-center cursor-pointer" style="background:rgba(0,0,0,0.7);" onclick="closePreview()">
+  <img id="imgPreview" src="" alt="预览" class="max-w-[85vw] max-h-[85vh] rounded-lg" style="box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+</div>
+
+<!-- ═══════════════════ Toast ═══════════════════ -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 px-4.5 py-2 rounded-[20px] z-[2000] opacity-0 pointer-events-none transition-opacity" style="font-size:var(--font-size-sm);transition-duration:var(--duration-normal);"></div>
+
+<!-- ═══════════════════ 自定义 CSS ═══════════════════ -->
+<style>
+  /* ── 侧边栏 ── */
+  .sidebar-item {
+    display:flex;align-items:center;gap:6px;padding:6px 8px;
+    font-size:var(--font-size-base);border-radius:var(--radius-md);
+    cursor:pointer;color:var(--color-text);white-space:nowrap;
+    transition:background var(--duration-fast) var(--ease-out);
+  }
+  .sidebar-item:hover { background:rgba(0,0,0,0.04); }
+  .sidebar-item.active { background:var(--color-primary);color:#fff; }
+  .sidebar-item.active span[style] { background:#fff !important; }
+
+  #sidebar.collapsed { width:38px !important; min-width:38px !important; }
+  #sidebar.collapsed #sidebarExpanded { display:none; }
+  #sidebar.collapsed #sidebarCollapsed { display:flex; }
+  #sidebar.collapsed #sidebarToggle { position:static; margin:10px auto 0; }
+
+  /* ── 预设卡片 ── */
+  .preset-card {
+    display:flex;align-items:center;gap:6px;padding:6px 8px;
+    font-size:var(--font-size-base);border-radius:var(--radius-md);
+    cursor:pointer;color:var(--color-text);white-space:nowrap;
+    position:relative;
+    transition:background var(--duration-fast) var(--ease-out);
+  }
+  .preset-card:hover { background:rgba(0,0,0,0.04); }
+  .preset-card:hover .preset-tooltip { display:flex; }
+
+  .preset-tooltip {
+    display:none;position:absolute;left:100%;top:50%;transform:translateY(-50%);
+    margin-left:8px;padding:6px 8px;gap:4px;flex-wrap:wrap;
+    background:var(--color-surface);border:1px solid var(--color-border);
+    border-radius:var(--radius-md);box-shadow:var(--shadow-md);
+    z-index:50;white-space:nowrap;min-width:120px;
+  }
+
+  .tooltip-pill {
+    padding:2px 6px;border-radius:var(--radius-sm);
+    font-size:var(--font-size-xs);font-weight:500;white-space:nowrap;
+    display:inline-block;
+  }
+
+  /* ── 右键菜单 ── */
+  .context-menu.show { display:block; }
+  .context-menu div:hover { background:var(--color-surface-alt); }
+
+  /* ── 头像 ── */
+  .msg-avatar {
+    width:36px;height:36px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;box-shadow:0 1px 4px rgba(74,55,40,0.08);
+  }
+  .msg-avatar img { width:100%;height:100%;object-fit:cover; }
+
+  .user-avatar {
+    background:linear-gradient(135deg, #F0E6DA 0%, #E8D5C0 100%);
+    border:2px solid #C9B99A;
+  }
+  .avatar-user-icon {
+    color:#B8A088;font-size:16px;font-weight:600;
+  }
+
+  .miss-avatar {
+    border:2px solid #E8C4BE;
+    background:#FBE5E0;
+  }
+
+  /* ── 消息行 ── */
+  .msg-row { display:flex;gap:10px;max-width:78%;align-items:flex-end; }
+  .msg-row.user { align-self:flex-end;flex-direction:row-reverse; }
+  .msg-row.miss { align-self:flex-start;flex-direction:row; }
+
+  .msg-body { display:flex;flex-direction:column;min-width:0; }
+  .msg-row.user .msg-body { align-items:flex-end; }
+  .msg-row.miss .msg-body { align-items:flex-start; }
+
+  .msg-sender {
+    font-size:var(--font-size-xs);color:var(--color-text-secondary);
+    margin-bottom:2px;padding:0 4px;
+  }
+
+  .msg-bubble {
+    padding:9px 13px;border-radius:var(--radius-lg);
+    font-size:var(--font-size-base);line-height:1.55;
+    cursor:pointer;position:relative;
+    word-break:break-word;
+    transition:transform var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out);
+  }
+  .msg-bubble:hover {
+    transform:translateY(-1px);
+    box-shadow:0 2px 6px rgba(74,55,40,0.08);
+  }
+
+  .msg-row.user .msg-bubble {
+    background:var(--color-user-bubble);
+    border-bottom-right-radius:4px;
+  }
+  .msg-row.user .msg-bubble::after {
+    content:'';position:absolute;bottom:0;right:-6px;
+    width:0;height:0;
+    border-left:6px solid var(--color-user-bubble);
+    border-bottom:6px solid transparent;
+    border-top:0px solid transparent;
+  }
+
+  .msg-row.miss .msg-bubble {
+    background:var(--color-miss-bubble);
+    border-bottom-left-radius:4px;
+  }
+  .msg-row.miss .msg-bubble::after {
+    content:'';position:absolute;bottom:0;left:-6px;
+    width:0;height:0;
+    border-right:6px solid var(--color-miss-bubble);
+    border-bottom:6px solid transparent;
+    border-top:0px solid transparent;
+  }
+
+  /* ── 内心独白 ── */
+  .msg-inner {
+    max-height:0;overflow:hidden;
+    transition:max-height 0.3s ease,margin 0.3s ease,padding 0.3s ease;
+    font-size:var(--font-size-sm);color:var(--color-text-secondary);
+    background:rgba(0,0,0,0.03);border-radius:var(--radius-md);
+    margin:0 4px;padding:0 10px;line-height:1.5;width:calc(100% - 8px);
+  }
+  .msg-inner.expanded { max-height:120px;margin:4px 4px 0;padding:8px 10px; }
+
+  /* ── 图片消息 ── */
+  .msg-img { max-width:240px;max-height:200px;border-radius:10px;cursor:pointer;margin:4px 0;border:2px solid var(--color-border);transition:transform 0.2s; }
+  .msg-img:hover { transform:scale(1.02); }
+  .img-placeholder {
+    display:flex;align-items:center;justify-content:center;
+    width:200px;height:140px;border-radius:10px;font-size:36px;
+    margin:4px 0;border:2px dashed var(--color-border);
+    background:rgba(0,0,0,0.02);color:#ccc;
+  }
+
+  /* ── 打字指示器 ── */
+  .typing-indicator {
+    display:flex;align-items:flex-end;gap:4px;padding:9px 13px;
+  }
+  .typing-indicator span {
+    width:6px;height:6px;border-radius:50%;
+    background:var(--color-text-muted);
+    animation:typingBounce 1.4s ease-in-out infinite;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay:0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay:0.4s; }
+
+  @keyframes typingBounce {
+    0%,60%,100% { transform:translateY(0);opacity:0.4; }
+    30% { transform:translateY(-6px);opacity:1; }
+  }
+
+  /* ── 消息入场动画 ── */
+  @keyframes fadeInUp {
+    from { opacity:0;transform:translateY(12px); }
+    to { opacity:1;transform:translateY(0); }
+  }
+  .msg-animate { animation:fadeInUp 0.3s var(--ease-out) forwards; }
+
+  /* ── 空状态动画 ── */
+  @keyframes sparkleFloat {
+    0%,100% { opacity:0.3;transform:translateY(0); }
+    50% { opacity:0.7;transform:translateY(-6px); }
+  }
+
+  /* ── 表情面板 ── */
+  .emoji-panel.show { display:flex; }
+  .emoji-item {
+    width:32px;height:32px;display:flex;align-items:center;
+    justify-content:center;font-size:20px;cursor:pointer;border-radius:var(--radius-md);
+  }
+  .emoji-item:hover { background:var(--color-surface-alt); }
+
+  /* ── Toast ── */
+  .toast.show { opacity:1; }
+  .toast { background:var(--color-text);color:#fff; }
+
+  /* ── 图片预览 ── */
+  #imgOverlay.show { display:flex; }
+
+  /* ── ⑨模式徽章动画 ── */
+  @keyframes cirnoSparkle {
+    0%,100% { opacity:0.5;transform:scale(0.8); }
+    50% { opacity:1;transform:scale(1.2); }
+  }
+  .cirno-sparkle {
+    display:inline-block;
+    animation:cirnoSparkle 1.5s ease-in-out infinite;
+  }
+  .cirno-badge.show { display:block; }
+
+  /* ── 滚动条 ── */
+  #chatMsgs::-webkit-scrollbar { width:5px; }
+  #chatMsgs::-webkit-scrollbar-thumb { background:var(--color-border);border-radius:3px; }
+  .attr-panel-scroll::-webkit-scrollbar { width:4px; }
+  .attr-panel-scroll::-webkit-scrollbar-thumb { background:var(--color-border);border-radius:2px; }
+
+  /* ── 属性面板 ── */
+  .attr-row { margin-bottom:14px; }
+  .attr-label {
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:var(--font-size-xs);color:var(--color-text-secondary);
+    margin-bottom:3px;
+  }
+  .attr-value-row { display:flex;align-items:center;gap:5px; }
+
+  .attr-slider {
+    flex:1;height:5px;-webkit-appearance:none;appearance:none;
+    border-radius:2px;outline:none;cursor:pointer;
+    background:var(--color-border);
+    transition:background var(--duration-slow) var(--ease-out);
+  }
+  .attr-slider::-webkit-slider-thumb {
+    -webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;
+    background:var(--color-primary);cursor:pointer;
+    transition:background var(--duration-normal) var(--ease-out);
+    box-shadow:0 1px 2px rgba(74,55,40,0.10);
+  }
+  .attr-slider::-webkit-slider-thumb:hover {
+    background:var(--color-primary-hover);
+  }
+
+  .intimacy-slider { background:linear-gradient(to right, var(--color-primary-muted), var(--color-primary-light)) !important; }
+  .intimacy-slider::-webkit-slider-thumb { background:var(--color-primary) !important; }
+
+  .attr-num-input {
+    width:38px;padding:2px 4px;border:1px solid var(--color-border);
+    border-radius:var(--radius-sm);font-size:var(--font-size-xs);
+    text-align:center;background:var(--color-surface);
+    color:var(--color-text);outline:none;font-family:var(--font-sans);flex-shrink:0;
+  }
+  .attr-num-input:focus { border-color:var(--color-primary); }
+
+  .attr-dirty-dot {
+    display:inline-block;width:5px;height:5px;background:var(--state-warning);
+    border-radius:50%;margin-left:2px;opacity:0;transition:opacity 0.2s;
+  }
+  .attr-dirty-dot.visible { opacity:1; }
+
+  /* ── 主题过渡 ── */
+  html { transition:background var(--duration-slow) var(--ease-out); }
+
+  /* ── prefers-reduced-motion ── */
+  @media (prefers-reduced-motion:reduce) {
+    *,*::before,*::after { animation-duration:0.01ms !important;transition-duration:0.01ms !important; }
+  }
+
+  /* ── 输入框聚焦 ── */
+  #msgInput:focus { border-color:var(--color-primary); }
+
+  /* ── 发送按钮禁用态 ── */
+  #sendBtn:disabled { opacity:0.5;cursor:not-allowed; }
+  #sendBtn:hover:not(:disabled) { background:var(--color-primary-hover); }
+
+  /* ── 文件上传按钮 hover ── */
+  .file-upload-btn:hover { border-color:var(--color-primary);color:var(--color-primary); }
+</style>
+
+<!-- ═══════════════════ JavaScript ═══════════════════ -->
+<script>
+(function(){
+  var profile = {};
+  var appliedProfile = {};
+  var ATTRS = ['rational_emotional','willpower','independent_submissive','education_level','intimacy','curiosity','humor','aggression','social_energy','adventurousness'];
+  ATTRS.forEach(function(a){ profile[a]=0;appliedProfile[a]=0; });
+
+  var activePreset = null;
+  var activePresetName = 'miss-default';
+  var ctxTarget = null;
+  var toastTimer = null;
+
+  /* ── 侧边栏 ── */
+  window.toggleSidebar = function(){
+    document.getElementById('sidebar').classList.toggle('collapsed');
+  };
+
+  window.switchSession = function(el, name){
+    document.querySelectorAll('.sidebar-item[data-sid]').forEach(function(i){ i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('sessionTitle').textContent = name;
+  };
+
+  window.addSession = function(){ toastMsg('会话已创建（演示）'); };
+
+  /* ── 属性控制 ── */
+  function getSliderEl(attr){
+    return document.querySelector('input[type="range"][data-attr="'+attr+'"]');
+  }
+  function getNumEl(attr){
+    return document.querySelector('input[type="number"][data-attr="'+attr+'"]');
+  }
+
+  function syncControls(attr, val){
+    var sl = getSliderEl(attr); if(sl) sl.value = val;
+    var ni = getNumEl(attr); if(ni) ni.value = val;
+    var dirty = document.getElementById('d_'+attr);
+    if(dirty) dirty.classList.toggle('visible', val !== appliedProfile[attr]);
+
+    if(attr === 'education_level'){
+      toggleCirnoTheme(val);
+    }
+  }
+
+  function toggleCirnoTheme(val){
+    if(val === -100){
+      document.documentElement.setAttribute('data-theme','cirno');
+      var badge = document.getElementById('cirnoBadge');
+      if(badge) badge.classList.add('show');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      var badge = document.getElementById('cirnoBadge');
+      if(badge) badge.classList.remove('show');
+    }
+  }
+
+  window.onSlider = function(slider){
+    var attr = slider.dataset.attr;
+    profile[attr] = parseInt(slider.value);
+    syncControls(attr, profile[attr]);
+  };
+
+  window.onNumInput = function(input){
+    var attr = input.dataset.attr;
+    var val = parseInt(input.value);
+    var min = attr === 'intimacy' ? 0 : -100;
+    if(isNaN(val)) val = min < 0 ? 0 : min;
+    if(val < min) val = min;
+    if(val > 100) val = 100;
+    input.value = val;
+    profile[attr] = val;
+    syncControls(attr, val);
+  };
+
+  window.applyProfile = function(){
+    ATTRS.forEach(function(a){ appliedProfile[a]=profile[a]; });
+    document.querySelectorAll('.attr-dirty-dot').forEach(function(d){ d.classList.remove('visible'); });
+    if(activePresetName === 'miss-default' && window._avatarSrc) {
+      document.getElementById('chatMissAvatar').src = window._avatarSrc;
+      activePresetName = window._presetName;
+    }
+    toastMsg('属性已应用');
+  };
+
+  window.resetAll = function(){
+    ATTRS.forEach(function(a){ profile[a]=0;appliedProfile[a]=0;syncControls(a,0); });
+    document.documentElement.removeAttribute('data-theme');
+    var badge = document.getElementById('cirnoBadge');
+    if(badge) badge.classList.remove('show');
+    activePresetName = 'miss-default';
+    document.getElementById('chatMissAvatar').src = '../assets/avatar-miss-default.jpg';
+    toastMsg('属性已重置');
+  };
+
+  /* ── 内心独白 ── */
+  window.toggleInner = function(bubble){
+    var inner = bubble.parentElement.querySelector('.msg-inner');
+    if(inner) inner.classList.toggle('expanded');
+  };
+  window.toggleAllInner = function(){
+    var show = document.getElementById('showInner').checked;
+    document.querySelectorAll('.msg-inner').forEach(function(el){ el.classList.toggle('expanded',show); });
+  };
+
+  /* ── 表情 ── */
+  window.toggleEmojiPanel = function(){
+    document.getElementById('emojiPanel').classList.toggle('show');
+  };
+  window.insertEmoji = function(emoji){
+    var input = document.getElementById('msgInput');
+    input.value += emoji;
+    input.focus();
+    document.getElementById('emojiPanel').classList.remove('show');
+  };
+
+  document.addEventListener('click', function(e){
+    var p = document.getElementById('emojiPanel');
+    if(!p.contains(e.target) && !e.target.closest('.emoji-picker-btn')) p.classList.remove('show');
+  });
+
+  /* ── 右键菜单 ── */
+  window.showContextMenu = function(e, el){
+    e.preventDefault();
+    ctxTarget = el;
+    var menu = document.getElementById('ctxMenu');
+    menu.style.left = e.clientX+'px';
+    menu.style.top = e.clientY+'px';
+    menu.classList.add('show');
+  };
+  document.addEventListener('click', function(){
+    document.getElementById('ctxMenu').classList.remove('show');
+    ctxTarget = null;
+  });
+
+  var PRESETS = {
+    '傲娇女友':{independent_submissive:-100,intimacy:100,aggression:40,rational_emotional:60},
+    '知性姐姐':{education_level:90,curiosity:80,humor:40,aggression:-50,social_energy:30},
+    '笨蛋⑨':{education_level:-100,curiosity:100,humor:60,social_energy:30},
+    '冰山美人':{rational_emotional:-100,aggression:-100,independent_submissive:-100,social_energy:-100}
+  };
+  var PRESET_AVATARS = {
+    '傲娇女友':'../assets/avatar-preset-tsundere.jpg',
+    '知性姐姐':'../assets/avatar-preset-intellectual.jpg',
+    '笨蛋⑨':'../assets/avatar-preset-baka.jpg',
+    '冰山美人':'../assets/avatar-preset-icequeen.jpg'
+  };
+
+  function setProfileVals(vals){
+    ATTRS.forEach(function(a){
+      if(vals[a] !== undefined){ profile[a]=vals[a];syncControls(a,vals[a]); }
+    });
+  }
+
+  window.applyPresetFromMenu = function(){
+    if(!ctxTarget) return;
+    var name = ctxTarget.dataset.preset;
+    if(PRESETS[name]){
+      setProfileVals(PRESETS[name]);
+      applyProfile();
+      activePresetName = name;
+      var av = PRESET_AVATARS[name];
+      if(av) document.getElementById('chatMissAvatar').src = av;
+      toastMsg('已应用预设：'+name);
+    }
+  };
+
+  window.applyPresetByName = function(el){
+    ctxTarget = el;
+    applyPresetFromMenu();
+    ctxTarget = null;
+  };
+
+  /* ── 消息发送 ── */
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function buildMsgHTML(type, avatarHtml, sender, text, innerText){
+    var html = '<div class="msg-row '+type+' msg-animate">';
+    html += avatarHtml;
+    html += '<div class="msg-body">';
+    html += '<div class="msg-sender">'+escapeHtml(sender)+'</div>';
+    if(text){
+      html += '<div class="msg-bubble"'+(type==='miss'?' onclick="toggleInner(this)"':'')+'>'+escapeHtml(text)+'</div>';
+    }
+    if(innerText){
+      html += '<div class="msg-inner">'+escapeHtml(innerText)+'</div>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function buildUserAvatarHTML(){
+    return '<div class="msg-avatar user-avatar"><span class="avatar-user-icon">✦</span></div>';
+  }
+
+  function buildMissAvatarHTML(){
+    var src = PRESET_AVATARS[activePresetName] || '../assets/avatar-miss-default.jpg';
+    return '<div class="msg-avatar miss-avatar"><img src="'+src+'" alt="MISS" id="chatMissAvatar"></div>';
+  }
+
+  window.sendMsg = function(){
+    var input = document.getElementById('msgInput');
+    var msg = input.value.trim();
+    if(!msg) return;
+    var container = document.getElementById('chatMsgs');
+    input.value = '';
+
+    // 隐藏空状态
+    var emptyState = document.getElementById('emptyState');
+    if(emptyState) emptyState.style.display = 'none';
+
+    // 添加用户消息
+    container.insertAdjacentHTML('beforeend', buildMsgHTML('user', buildUserAvatarHTML(), '我', msg));
+
+    // 显示打字指示器
+    var typingHTML = '<div class="msg-row miss msg-animate" id="typingIndicator">';
+    typingHTML += buildMissAvatarHTML();
+    typingHTML += '<div class="msg-body"><div class="msg-sender">MISS</div>';
+    typingHTML += '<div class="msg-bubble typing-indicator"><span></span><span></span><span></span></div>';
+    typingHTML += '</div></div>';
+    container.insertAdjacentHTML('beforeend', typingHTML);
+
+    // 模拟回复
+    setTimeout(function(){
+      var typingEl = document.getElementById('typingIndicator');
+      if(typingEl) typingEl.remove();
+
+      var replies = [
+        {spoken:'嗯...我听到了。让我想想怎么回应你 😌',inner:'他在跟我说话呢。虽然只是模拟模式，但我还是要认真对待每一个对话。毕竟在他眼里我是有灵魂的。'},
+        {spoken:'你说得对。不过我的看法可能和你不太一样哦 🤔',inner:'唔，这个问题有点意思。虽然内心认同他的一部分观点，但直接同意也太没个性了。稍微表达一下不同意见好了。'},
+        {spoken:'诶？这个我还真没想过呢。你怎么会想到这个的？😯',inner:'被问到了没准备的话题！不过他的好奇心传染给我了，我也有点想了解。先反问回去看看他会说什么。'},
+        {spoken:'哈哈，你真有意思 ❤️ 跟你聊天总是很轻松。',inner:'他总能说出让我意外的话。这种轻松的氛围让我不由自主地想多聊几句。虽然我不该太快表达好感，但偶尔这样应该没关系吧。'}
+      ];
+      var r = replies[Math.floor(Math.random()*replies.length)];
+      container.insertAdjacentHTML('beforeend', buildMsgHTML('miss', buildMissAvatarHTML(), 'MISS', r.spoken, r.inner));
+      container.scrollTop = container.scrollHeight;
+    }, 900 + Math.random()*600);
+
+    container.scrollTop = container.scrollHeight;
+  };
+
+  /* ── 图片上传模拟 ── */
+  window.simulateImageUpload = function(){
+    var container = document.getElementById('chatMsgs');
+    var emptyState = document.getElementById('emptyState');
+    if(emptyState) emptyState.style.display = 'none';
+
+    container.insertAdjacentHTML('beforeend',
+      '<div class="msg-row user msg-animate">'+buildUserAvatarHTML()+'<div class="msg-body"><div class="msg-sender">我</div><div class="img-placeholder" onclick="previewPlaceholder(this)">🖼</div><div class="msg-bubble">[图片] 📷</div></div></div>'
+    );
+
+    setTimeout(function(){
+      var missHTML = '<div class="msg-row miss msg-animate">';
+      missHTML += buildMissAvatarHTML();
+      missHTML += '<div class="msg-body"><div class="msg-sender">MISS</div>';
+      missHTML += '<div class="msg-bubble" onclick="toggleInner(this)">哦？发图给我了。让我看看...嗯，挺有意思的 😄</div>';
+      missHTML += '<div class="msg-inner">他又发图片给我了。虽然看不清楚但还是很开心。想仔细看看他又给我分享了什么好玩的东西。</div>';
+      missHTML += '</div></div>';
+      container.insertAdjacentHTML('beforeend', missHTML);
+      container.scrollTop = container.scrollHeight;
+    }, 900);
+    container.scrollTop = container.scrollHeight;
+  };
+
+  window.previewPlaceholder = function(el){
+    toastMsg('图片预览（演示模式）');
+  };
+  window.closePreview = function(){
+    document.getElementById('imgOverlay').classList.remove('show');
+  };
+
+  /* ── Toast ── */
+  window.toastMsg = function(msg){
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 1800);
+  };
+
+  /* ── 全局点击关闭 ── */
+  document.addEventListener('click', function(e){
+    document.getElementById('ctxMenu').classList.remove('show');
+    ctxTarget = null;
+  });
+
+  /* ── 初始化 ── */
+  document.getElementById('sidebar').classList.remove('collapsed');
+
+  /* ── 图标渲染 ── */
+  if(typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+})();
+</script>
+</body>
+</html>

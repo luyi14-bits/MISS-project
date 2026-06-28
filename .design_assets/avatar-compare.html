@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MISS 头像风格对比</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif;
+  background: #FDF8F0; color: #4A3728;
+  padding: 40px; min-height: 100vh;
+}
+h1 { text-align: center; font-size: 24px; margin-bottom: 8px; }
+.sub { text-align: center; color: #8B7355; font-size: 13px; margin-bottom: 36px; }
+.grid { display: flex; gap: 24px; max-width: 1100px; margin: 0 auto; }
+.card {
+  flex: 1; background: #FFFBFA; border-radius: 16px;
+  padding: 28px 20px; text-align: center;
+  border: 2px solid #E8DDD4; transition: all 0.3s;
+}
+.card:hover { border-color: #D4786E; box-shadow: 0 4px 20px rgba(0,0,0,0.06); transform: translateY(-2px); }
+.card h2 { font-size: 16px; margin-bottom: 8px; color: #4A3728; }
+.card .desc { font-size: 11px; color: #8B7355; line-height: 1.5; margin-bottom: 18px; min-height: 44px; }
+.avatar-wrap { position: relative; display: inline-block; }
+.avatar-wrap img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #E8C4BE; }
+.avatar-wrap .role-tag {
+  position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+  background: #D4786E; color: #fff; font-size: 10px;
+  padding: 3px 10px; border-radius: 10px; white-space: nowrap;
+}
+.note { text-align: center; margin-top: 36px; color: #8B7355; font-size: 12px; }
+.note em { color: #D4786E; font-style: normal; }
+</style>
+</head>
+<body>
+<h1>MISS 角色头像 — 三种风格对比</h1>
+<p class="sub">以默认 MISS 角色（温柔 AI 女孩）为例预览，选定风格后我会为全部 5 个角色定制头像</p>
+
+<div class="grid">
+  <div class="card">
+    <h2>🎨 二次元插画风</h2>
+    <p class="desc">日系手绘感，柔和的线条与暖色调，表情细腻富有情感，最贴合 AI 伴侣的亲密调性</p>
+    <div class="avatar-wrap">
+      <img src="avatar-style-anime.jpg" alt="二次元插画风">
+      <span class="role-tag">MISS 默认</span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>✨ 3D 渲染风</h2>
+    <p class="desc">Pixar 式柔和 3D 角色，皮肤质感自然，光影细腻，科技感与亲和力并存</p>
+    <div class="avatar-wrap">
+      <img src="avatar-style-3d.jpg" alt="3D渲染风">
+      <span class="role-tag">MISS 默认</span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>◈ 几何抽象风</h2>
+    <p class="desc">极简几何图形构建抽象角色形象，北欧设计感，简洁现代但辨识度和亲和力较弱</p>
+    <div class="avatar-wrap">
+      <img src="avatar-style-geometric.jpg" alt="几何抽象风">
+      <span class="role-tag">MISS 默认</span>
+    </div>
+  </div>
+</div>
+
+<p class="note">以上仅为默认 MISS 角色的风格预览。选定风格后，我会为 <em>傲娇女友、知性姐姐、笨蛋⑨、冰山美人</em> 四个预设角色分别定制符合人设的专属头像。</p>
+</body>
+</html>

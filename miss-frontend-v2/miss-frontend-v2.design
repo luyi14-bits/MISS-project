@@ -1,0 +1,95 @@
+{
+  "data": [
+    {
+      "id": "page-chat",
+      "title": "聊天主界面",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1751368800000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/chat.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "image-001",
+      "title": "MISS 默认角色头像",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751368800000,
+      "canvasData": {
+        "x": 0,
+        "y": 377
+      },
+      "devMetadata": {
+        "imageSrc": "assets/avatar-miss-default.jpg"
+      }
+    },
+    {
+      "id": "image-002",
+      "title": "傲娇女友预设头像",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751368800000,
+      "canvasData": {
+        "x": 620,
+        "y": 377
+      },
+      "devMetadata": {
+        "imageSrc": "assets/avatar-preset-tsundere.jpg"
+      }
+    },
+    {
+      "id": "image-003",
+      "title": "知性姐姐预设头像",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751368800000,
+      "canvasData": {
+        "x": 1240,
+        "y": 377
+      },
+      "devMetadata": {
+        "imageSrc": "assets/avatar-preset-intellectual.jpg"
+      }
+    },
+    {
+      "id": "image-004",
+      "title": "笨蛋⑨预设头像",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751368800000,
+      "canvasData": {
+        "x": 1860,
+        "y": 377
+      },
+      "devMetadata": {
+        "imageSrc": "assets/avatar-preset-baka.jpg"
+      }
+    },
+    {
+      "id": "image-005",
+      "title": "冰山美人预设头像",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751368800000,
+      "canvasData": {
+        "x": 2480,
+        "y": 377
+      },
+      "devMetadata": {
+        "imageSrc": "assets/avatar-preset-icequeen.jpg"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "MISS 前端 v2 重设计"
+  }
+}

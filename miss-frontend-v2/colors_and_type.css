@@ -1,0 +1,89 @@
+/* ── MISS v2 Design Tokens ── */
+/* Café au Lait 暖色主调 + 二次元轻量装饰 + ⑨模式冰蓝联动 */
+
+:root {
+  /* ══ 主色调 ══ */
+  --color-primary: #D4786E;
+  --color-primary-hover: #C05A4E;
+  --color-primary-light: #FBE5E0;
+  --color-primary-muted: #F5E0DC;
+
+  /* ══ 中性色 ══ */
+  --color-bg: #FDF8F0;
+  --color-surface: #FFFBFA;
+  --color-surface-alt: #F5EDE3;
+  --color-border: #E8DDD4;
+  --color-text: #4A3728;
+  --color-text-secondary: #8B7355;
+  --color-text-muted: #C8BBA8;
+
+  /* ══ 消息气泡 ══ */
+  --color-user-bubble: #F0E6DA;
+  --color-miss-bubble: #FBE5E0;
+
+  /* ══ 状态色 ══ */
+  --state-success: #7BA587;
+  --state-warning: #D4A857;
+  --state-error: #C05A4E;
+
+  /* ══ ⑨模式色（默认隐藏） ══ */
+  --color-cirno-blue: #00BFFF;
+  --color-cirno-light: #87CEEB;
+  --color-cirno-bg: #F0F8FF;
+  --color-cirno-surface: #F5FAFE;
+  --color-cirno-border: #B8E0F0;
+  --color-cirno-text: #2A4A5A;
+  --color-cirno-text-secondary: #5A8A9A;
+  --color-cirno-bubble: #E0F0FA;
+
+  /* ══ 圆角 ══ */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* ══ 阴影 ══ */
+  --shadow-sm: 0 1px 3px rgba(74, 55, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(74, 55, 40, 0.08);
+  --shadow-lg: 0 8px 24px rgba(74, 55, 40, 0.10);
+  --shadow-float: 0 4px 16px rgba(74, 55, 40, 0.12);
+
+  /* ══ 字型 ══ */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 11px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+
+  /* ══ 动效 ══ */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 0.15s;
+  --duration-normal: 0.25s;
+  --duration-slow: 0.35s;
+}
+
+/* ══ ⑨模式 全局主题切换 ══ */
+:root[data-theme="cirno"] {
+  --color-primary: var(--color-cirno-blue);
+  --color-primary-hover: #0099CC;
+  --color-primary-light: #D0F0FF;
+  --color-primary-muted: #B8E8FF;
+  --color-bg: var(--color-cirno-bg);
+  --color-surface: var(--color-cirno-surface);
+  --color-surface-alt: #E8F4FC;
+  --color-border: var(--color-cirno-border);
+  --color-text: var(--color-cirno-text);
+  --color-text-secondary: var(--color-cirno-text-secondary);
+  --color-text-muted: #8AB8C8;
+  --color-user-bubble: #E8F4FC;
+  --color-miss-bubble: var(--color-cirno-bubble);
+}
+
+/* ══ 排版工具类 ══ */
+.text-caption { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+.text-body { font-size: var(--font-size-base); color: var(--color-text); line-height: 1.55; }
+.text-heading { font-size: var(--font-size-md); font-weight: 600; color: var(--color-text); }

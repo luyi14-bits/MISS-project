@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MISS": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}

@@ -1,0 +1,370 @@
+/* ── MISS Desktop Style ── */
+
+/* ── MISS v2 Design Tokens ── */
+/* Café au Lait 暖色主调 + 二次元轻量装饰 + ⑨模式冰蓝联动 */
+
+:root {
+  /* ══ 主色调 ══ */
+  --color-primary: #D4786E;
+  --color-primary-hover: #C05A4E;
+  --color-primary-light: #FBE5E0;
+  --color-primary-muted: #F5E0DC;
+
+  /* ══ 中性色 ══ */
+  --color-bg: #FDF8F0;
+  --color-surface: #FFFBFA;
+  --color-surface-alt: #F5EDE3;
+  --color-border: #E8DDD4;
+  --color-text: #4A3728;
+  --color-text-secondary: #8B7355;
+  --color-text-muted: #C8BBA8;
+
+  /* ══ 消息气泡 ══ */
+  --color-user-bubble: #F0E6DA;
+  --color-miss-bubble: #FBE5E0;
+
+  /* ══ 状态色 ══ */
+  --state-success: #7BA587;
+  --state-warning: #D4A857;
+  --state-error: #C05A4E;
+
+  /* ══ ⑨模式色（默认隐藏） ══ */
+  --color-cirno-blue: #00BFFF;
+  --color-cirno-light: #87CEEB;
+  --color-cirno-bg: #F0F8FF;
+  --color-cirno-surface: #F5FAFE;
+  --color-cirno-border: #B8E0F0;
+  --color-cirno-text: #2A4A5A;
+  --color-cirno-text-secondary: #5A8A9A;
+  --color-cirno-bubble: #E0F0FA;
+
+  /* ══ 圆角 ══ */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* ══ 阴影 ══ */
+  --shadow-sm: 0 1px 3px rgba(74, 55, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(74, 55, 40, 0.08);
+  --shadow-lg: 0 8px 24px rgba(74, 55, 40, 0.10);
+  --shadow-float: 0 4px 16px rgba(74, 55, 40, 0.12);
+
+  /* ══ 字型 ══ */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 11px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+
+  /* ══ 动效 ══ */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 0.15s;
+  --duration-normal: 0.25s;
+  --duration-slow: 0.35s;
+}
+
+/* ══ ⑨模式 全局主题切换 ══ */
+:root[data-theme="cirno"] {
+  --color-primary: var(--color-cirno-blue);
+  --color-primary-hover: #0099CC;
+  --color-primary-light: #D0F0FF;
+  --color-primary-muted: #B8E8FF;
+  --color-bg: var(--color-cirno-bg);
+  --color-surface: var(--color-cirno-surface);
+  --color-surface-alt: #E8F4FC;
+  --color-border: var(--color-cirno-border);
+  --color-text: var(--color-cirno-text);
+  --color-text-secondary: var(--color-cirno-text-secondary);
+  --color-text-muted: #8AB8C8;
+  --color-user-bubble: #E8F4FC;
+  --color-miss-bubble: var(--color-cirno-bubble);
+}
+
+/* ══ 排版工具类 ══ */
+.text-caption { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+.text-body { font-size: var(--font-size-base); color: var(--color-text); line-height: 1.55; }
+.text-heading { font-size: var(--font-size-md); font-weight: 600; color: var(--color-text); }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+[data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  background-color: currentColor;
+}
+
+/* ── 侧边栏 ── */
+.sidebar-item {
+  display:flex;align-items:center;gap:6px;padding:6px 8px;
+  font-size:var(--font-size-base);border-radius:var(--radius-md);
+  cursor:pointer;color:var(--color-text);white-space:nowrap;
+  transition:background var(--duration-fast) var(--ease-out);
+}
+.sidebar-item:hover { background:rgba(0,0,0,0.04); }
+.sidebar-item.active { background:var(--color-primary);color:#fff; }
+.sidebar-item.active span[style] { background:#fff !important; }
+
+#sidebar.collapsed { width:38px !important; min-width:38px !important; }
+#sidebar.collapsed #sidebarExpanded { display:none; }
+#sidebar.collapsed #sidebarCollapsed { display:flex; }
+#sidebar.collapsed #sidebarToggle { position:static; margin:10px auto 0; }
+
+/* ── 角色卡片 ── */
+.preset-card {
+  display:flex;align-items:center;gap:6px;padding:6px 8px;
+  font-size:var(--font-size-base);border-radius:var(--radius-md);
+  cursor:pointer;color:var(--color-text);white-space:nowrap;
+  position:relative;
+  transition:background var(--duration-fast) var(--ease-out);
+}
+.preset-card:hover { background:rgba(0,0,0,0.04); }
+.preset-card:hover .preset-tooltip { display:flex; }
+
+.preset-tooltip {
+  display:none;position:absolute;left:100%;top:50%;transform:translateY(-50%);
+  margin-left:8px;padding:6px 8px;gap:4px;flex-wrap:wrap;
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-md);box-shadow:var(--shadow-md);
+  z-index:50;white-space:nowrap;min-width:120px;
+}
+
+.tooltip-pill {
+  padding:2px 6px;border-radius:var(--radius-sm);
+  font-size:var(--font-size-xs);font-weight:500;white-space:nowrap;
+  display:inline-block;
+}
+
+/* ── 右键菜单 ── */
+.context-menu.show { display:block; }
+.context-menu div:hover { background:var(--color-surface-alt); }
+
+/* ── 头像 ── */
+.msg-avatar {
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;box-shadow:0 1px 4px rgba(74,55,40,0.08);
+}
+.msg-avatar img { width:100%;height:100%;object-fit:cover; }
+
+.user-avatar {
+  background:linear-gradient(135deg, #F0E6DA 0%, #E8D5C0 100%);
+  border:2px solid #C9B99A;
+}
+.avatar-user-icon {
+  color:#B8A088;font-size:16px;font-weight:600;
+}
+
+.miss-avatar {
+  border:2px solid #E8C4BE;
+  background:#FBE5E0;
+}
+
+/* ── 消息行 ── */
+.msg-row { display:flex;gap:10px;max-width:78%;align-items:flex-end; }
+.msg-row.user { align-self:flex-end;flex-direction:row-reverse; }
+.msg-row.miss { align-self:flex-start;flex-direction:row; }
+
+.msg-body { display:flex;flex-direction:column;min-width:0; }
+.msg-row.user .msg-body { align-items:flex-end; }
+.msg-row.miss .msg-body { align-items:flex-start; }
+
+.msg-sender {
+  font-size:var(--font-size-xs);color:var(--color-text-secondary);
+  margin-bottom:2px;padding:0 4px;
+}
+
+.msg-bubble {
+  padding:9px 13px;border-radius:var(--radius-lg);
+  font-size:var(--font-size-base);line-height:1.55;
+  cursor:pointer;position:relative;
+  word-break:break-word;
+  transition:transform var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out);
+}
+.msg-bubble:hover {
+  transform:translateY(-1px);
+  box-shadow:0 2px 6px rgba(74,55,40,0.08);
+}
+
+.msg-row.user .msg-bubble {
+  background:var(--color-user-bubble);
+  border-bottom-right-radius:4px;
+}
+.msg-row.user .msg-bubble::after {
+  content:'';position:absolute;bottom:0;right:-6px;
+  width:0;height:0;
+  border-left:6px solid var(--color-user-bubble);
+  border-bottom:6px solid transparent;
+  border-top:0px solid transparent;
+}
+
+.msg-row.miss .msg-bubble {
+  background:var(--color-miss-bubble);
+  border-bottom-left-radius:4px;
+}
+.msg-row.miss .msg-bubble::after {
+  content:'';position:absolute;bottom:0;left:-6px;
+  width:0;height:0;
+  border-right:6px solid var(--color-miss-bubble);
+  border-bottom:6px solid transparent;
+  border-top:0px solid transparent;
+}
+
+/* ── 内心独白 ── */
+.msg-inner {
+  max-height:0;overflow:hidden;
+  transition:max-height 0.3s ease,margin 0.3s ease,padding 0.3s ease;
+  font-size:var(--font-size-sm);color:var(--color-text-secondary);
+  background:rgba(0,0,0,0.03);border-radius:var(--radius-md);
+  margin:0 4px;padding:0 10px;line-height:1.5;width:calc(100% - 8px);
+}
+.msg-inner.expanded { max-height:none;margin:4px 4px 0;padding:8px 10px; }
+
+/* ── 图片消息 ── */
+.msg-img { max-width:240px;max-height:200px;border-radius:10px;cursor:pointer;margin:4px 0;border:2px solid var(--color-border);transition:transform 0.2s; }
+.msg-img:hover { transform:scale(1.02); }
+.img-placeholder {
+  display:flex;align-items:center;justify-content:center;
+  width:200px;height:140px;border-radius:10px;font-size:36px;
+  margin:4px 0;border:2px dashed var(--color-border);
+  background:rgba(0,0,0,0.02);color:#ccc;
+}
+
+/* ── 打字指示器 ── */
+.typing-indicator {
+  display:flex;align-items:flex-end;gap:4px;padding:9px 13px;
+}
+.typing-indicator span {
+  width:6px;height:6px;border-radius:50%;
+  background:var(--color-text-muted);
+  animation:typingBounce 1.4s ease-in-out infinite;
+}
+.typing-indicator span:nth-child(2) { animation-delay:0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay:0.4s; }
+
+@keyframes typingBounce {
+  0%,60%,100% { transform:translateY(0);opacity:0.4; }
+  30% { transform:translateY(-6px);opacity:1; }
+}
+
+/* ── 消息入场动画 ── */
+@keyframes fadeInUp {
+  from { opacity:0;transform:translateY(12px); }
+  to { opacity:1;transform:translateY(0); }
+}
+.msg-animate { animation:fadeInUp 0.3s var(--ease-out) forwards; }
+
+/* ── 空状态动画 ── */
+@keyframes sparkleFloat {
+  0%,100% { opacity:0.3;transform:translateY(0); }
+  50% { opacity:0.7;transform:translateY(-6px); }
+}
+
+/* ── 表情面板 ── */
+.emoji-panel.show { display:flex; }
+.emoji-item {
+  width:32px;height:32px;display:flex;align-items:center;
+  justify-content:center;font-size:20px;cursor:pointer;border-radius:var(--radius-md);
+}
+.emoji-item:hover { background:var(--color-surface-alt); }
+
+/* ── Toast ── */
+.toast.show { opacity:1; }
+.toast { background:var(--color-text);color:#fff; }
+
+/* ── 图片预览 ── */
+#imgOverlay.show { display:flex; }
+
+/* ── ⑨模式徽章动画 ── */
+@keyframes cirnoSparkle {
+  0%,100% { opacity:0.5;transform:scale(0.8); }
+  50% { opacity:1;transform:scale(1.2); }
+}
+.cirno-sparkle {
+  display:inline-block;
+  animation:cirnoSparkle 1.5s ease-in-out infinite;
+}
+.cirno-badge.show { display:block; }
+
+/* ── 滚动条 ── */
+#chatMsgs::-webkit-scrollbar { width:5px; }
+#chatMsgs::-webkit-scrollbar-thumb { background:var(--color-border);border-radius:3px; }
+.attr-panel-scroll::-webkit-scrollbar { width:4px; }
+.attr-panel-scroll::-webkit-scrollbar-thumb { background:var(--color-border);border-radius:2px; }
+
+/* ── 属性面板 ── */
+.attr-row { margin-bottom:14px; }
+.attr-label {
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:var(--font-size-xs);color:var(--color-text-secondary);
+  margin-bottom:3px;
+}
+.attr-value-row { display:flex;align-items:center;gap:5px; }
+
+.attr-slider {
+  flex:1;height:5px;-webkit-appearance:none;appearance:none;
+  border-radius:2px;outline:none;cursor:pointer;
+  background:var(--color-border);
+  transition:background var(--duration-slow) var(--ease-out);
+}
+.attr-slider::-webkit-slider-thumb {
+  -webkit-appearance:none;appearance:none;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--color-primary);cursor:pointer;
+  transition:background var(--duration-normal) var(--ease-out);
+  box-shadow:0 1px 2px rgba(74,55,40,0.10);
+}
+.attr-slider::-webkit-slider-thumb:hover {
+  background:var(--color-primary-hover);
+}
+
+.intimacy-slider { background:linear-gradient(to right, var(--color-primary-muted), var(--color-primary-light)) !important; }
+.intimacy-slider::-webkit-slider-thumb { background:var(--color-primary) !important; }
+
+.attr-num-input {
+  width:38px;padding:2px 4px;border:1px solid var(--color-border);
+  border-radius:var(--radius-sm);font-size:var(--font-size-xs);
+  text-align:center;background:var(--color-surface);
+  color:var(--color-text);outline:none;font-family:var(--font-sans);flex-shrink:0;
+}
+.attr-num-input:focus { border-color:var(--color-primary); }
+
+.attr-dirty-dot {
+  display:inline-block;width:5px;height:5px;background:var(--state-warning);
+  border-radius:50%;margin-left:2px;opacity:0;transition:opacity 0.2s;
+}
+.attr-dirty-dot.visible { opacity:1; }
+
+/* ── 主题过渡 ── */
+html { transition:background var(--duration-slow) var(--ease-out); }
+
+/* ── prefers-reduced-motion ── */
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after { animation-duration:0.01ms !important;transition-duration:0.01ms !important; }
+}
+
+/* ── 输入框聚焦 ── */
+#msgInput:focus { border-color:var(--color-primary); }
+
+/* ── 发送按钮禁用态 ── */
+#sendBtn:disabled { opacity:0.5;cursor:not-allowed; }
+#sendBtn:hover:not(:disabled) { background:var(--color-primary-hover); }
+
+/* ── 文件上传按钮 hover ── */
+.file-upload-btn:hover { border-color:var(--color-primary);color:var(--color-primary); }
+
+/* ── 设置弹窗 ── */
+#settingsModal.hidden { display:none !important; }
+#newPresetModal.hidden { display:none !important; }
+#settingsModal input:focus { border-color:var(--color-primary); }

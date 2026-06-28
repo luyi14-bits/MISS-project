@@ -1,0 +1,153 @@
+<UserControl x:Class="MISS.Views.ConversationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:MISS.Controls"
+             xmlns:vm="clr-namespace:MISS.ViewModels"
+             xmlns:views="clr-namespace:MISS.Views">
+    <UserControl.Resources>
+        <views:FirstCharConverter x:Key="FirstCharConverter"/>
+        <views:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title bar -->
+        <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+                Padding="12,8">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <!-- 角色头像 -->
+                    <Border Width="28" Height="28" CornerRadius="14"
+                            Background="{DynamicResource PrimaryBrush}" Margin="0,0,8,0"
+                            Visibility="{Binding CurrentRole.Name, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+                        <TextBlock Text="{Binding CurrentRole.Name, Converter={StaticResource FirstCharConverter}, TargetNullValue='?'}"
+                                   FontSize="13" FontWeight="Bold"
+                                   Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <!-- 会话标题 -->
+                    <TextBlock Text="{Binding CurrentSession.Title, FallbackValue=MISS}"
+                               FontSize="14" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text=" · 当前对话：" FontSize="12"
+                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                    <TextBlock Text="{Binding CurrentRole.Name, TargetNullValue='未指定角色'}"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <CheckBox Content="内心独白"
+                              IsChecked="{Binding IsInnerThoughtVisible}"
+                              VerticalAlignment="Center" Margin="0,0,10,0"
+                              Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                    <Button Content="⚙" Width="28" Height="28"
+                            Style="{DynamicResource IconButtonStyle}"
+                            Click="OpenSettings_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Chat messages area -->
+        <ScrollViewer x:Name="ChatScrollViewer" Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      Background="{DynamicResource BgBrush}">
+            <ItemsControl x:Name="ChatItemsControl" Margin="16,12"
+                          ItemsSource="{Binding MessagesView}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type controls:ChatMessage}">
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border x:Name="UserBubble"
+                                    Grid.Column="1"
+                                    Background="{DynamicResource UserBubbleBrush}"
+                                    CornerRadius="12,12,4,12"
+                                    Padding="10,8"
+                                    MaxWidth="400"
+                                    HorizontalAlignment="Right"
+                                    Visibility="Collapsed">
+                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           FontSize="13" LineHeight="20"/>
+                            </Border>
+
+                            <StackPanel x:Name="MissBubble" Grid.Column="0"
+                                        MaxWidth="400"
+                                        HorizontalAlignment="Left"
+                                        Visibility="Collapsed">
+                                <TextBlock Text="{Binding Sender}" FontSize="10"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="4,0,0,2"/>
+                                <Border Background="{DynamicResource MissBubbleBrush}"
+                                        CornerRadius="12,12,12,4"
+                                        Padding="10,8">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Text}"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="{DynamicResource TextBrush}"
+                                                   FontSize="13" LineHeight="20"/>
+                                        <Border Background="#18000000"
+                                                CornerRadius="4"
+                                                Padding="6,4" Margin="0,4,0,0"
+                                                Visibility="{Binding IsInnerVisible, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}">
+                                            <TextBlock Text="{Binding InnerThought}"
+                                                       TextWrapping="Wrap"
+                                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                                       FontSize="11"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsUser}" Value="True">
+                                <Setter TargetName="UserBubble" Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsUser}" Value="False">
+                                <Setter TargetName="MissBubble" Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Input area -->
+        <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"
+                Padding="12,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="MessageInput" Grid.Column="0"
+                         Padding="12,8" FontSize="13"
+                         Background="{DynamicResource BgBrush}"
+                         BorderBrush="{DynamicResource BorderBrush}"
+                         BorderThickness="1"
+                         VerticalContentAlignment="Center"
+                         KeyDown="MessageInput_KeyDown"
+                         TextWrapping="Wrap" AcceptsReturn="False"/>
+
+                <CheckBox x:Name="StreamToggle" Grid.Column="1"
+                          Content="流式" IsChecked="True"
+                          VerticalAlignment="Center" Margin="8,0,4,0"
+                          Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+
+                <Button x:Name="SendButton" Grid.Column="2"
+                        Content="发送"
+                        Style="{DynamicResource PrimaryButtonStyle}"
+                        Click="SendButton_Click" Padding="20,8"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

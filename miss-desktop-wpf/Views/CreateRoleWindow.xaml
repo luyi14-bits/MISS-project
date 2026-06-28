@@ -1,0 +1,100 @@
+<Window x:Class="MISS.Views.CreateRoleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="创建新角色" Width="440" Height="520"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{DynamicResource BgBrush}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title bar -->
+        <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+                Padding="20,16">
+            <TextBlock Text="✦ 创建新角色" FontSize="16" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextBrush}"/>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20,16">
+
+                <!-- Role name -->
+                <TextBlock Text="角色名称" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextBrush}" Margin="0,0,0,6"/>
+                <TextBox x:Name="NameInput" Padding="10,9" FontSize="13" Margin="0,0,0,14"
+                         Background="{DynamicResource SurfaceBrush}"
+                         BorderBrush="{DynamicResource BorderBrush}"
+                         BorderThickness="1"/>
+
+                <!-- Description -->
+                <TextBlock Text="角色描述" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextBrush}" Margin="0,0,0,6"/>
+                <TextBlock Text="AI 将自动分析描述并生成属性值" FontSize="10"
+                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,6"/>
+                <TextBox x:Name="DescInput" Padding="10,9" FontSize="13" Height="80"
+                         TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,14"
+                         Background="{DynamicResource SurfaceBrush}"
+                         BorderBrush="{DynamicResource BorderBrush}"
+                         BorderThickness="1"/>
+
+                <!-- Background -->
+                <TextBlock Text="人物背景（可选）" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextBrush}" Margin="0,0,0,6"/>
+                <TextBox x:Name="BgInput" Padding="10,9" FontSize="13" Height="64"
+                         TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,14"
+                         Background="{DynamicResource SurfaceBrush}"
+                         BorderBrush="{DynamicResource BorderBrush}"
+                         BorderThickness="1"/>
+
+                <!-- Avatar picker -->
+                <TextBlock Text="角色头像（可选）" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextBrush}" Margin="0,0,0,6"/>
+                <Grid Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="AvatarPreview" Grid.Column="0" Width="56" Height="56"
+                            CornerRadius="28" ClipToBounds="True"
+                            Background="{DynamicResource PrimaryLightBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="2">
+                        <Image x:Name="AvatarImage"
+                               Stretch="UniformToFill"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="14,0,0,0">
+                        <Button Content="选择头像..." Style="{DynamicResource SecondaryButtonStyle}"
+                                Click="PickAvatar_Click" Padding="14,6" FontSize="12"/>
+                        <TextBlock x:Name="AvatarPathText" Text="" FontSize="10"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Bottom action bar -->
+        <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"
+                Padding="20,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusText" Grid.Column="0" Text="" FontSize="11"
+                           Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Content="取消" Style="{DynamicResource SecondaryButtonStyle}"
+                        Click="Cancel_Click" Margin="0,0,8,0"/>
+                <Button Grid.Column="2" Content="生成并创建" Style="{DynamicResource PrimaryButtonStyle}"
+                        Click="Create_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

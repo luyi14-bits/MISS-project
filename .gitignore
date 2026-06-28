@@ -1,0 +1,97 @@
+# ========================================
+# Python
+# ========================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Pytest
+.pytest_cache/
+*.pytest_cache
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+dist/
+build/
+publish/
+eggs/
+sdist/
+wheels/
+obj/
+bin/
+*.pdb
+*.toc
+*.pkg
+*.pyz
+*_absolute.txt
+xref*.html
+*.spec
+!requirements*.txt
+
+# ========================================
+# IDE / Editor
+# ========================================
+.instance
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ========================================
+# Environment & Secrets
+# ========================================
+.env
+.env.local
+.env.*.local
+
+# ========================================
+# Database & Data
+# ========================================
+*.db
+*.db-shm
+*.db-wal
+*.sqlite3
+vector_db/
+!tests/data/*.db
+
+# ========================================
+# Tool States (TRAE internal)
+# ========================================
+.superpowers/
+.trae/
+
+# ========================================
+# 不上传
+# ========================================
+miss-market-research/
+
+# ========================================
+# OS
+# ========================================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ========================================
+# Logs
+# ========================================
+*.log

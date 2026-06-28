@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISS AI Companion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loadingScreen" style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--color-bg, #FDF8F0);color:var(--color-text, #4A3728);font-family:-apple-system,BlinkMacSystemFont,'Microsoft YaHei',sans-serif;">
+        <div style="font-size:48px;margin-bottom:16px;">✦</div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:8px;">MISS 正在启动</div>
+        <div style="font-size:13px;color:var(--color-text-secondary, #8B7355);" id="loadingStatus">正在启动后端服务...</div>
+    </div>
+
+    <main class="flex h-screen overflow-hidden" style="background:var(--color-bg);color:var(--color-text);">
+
+<!-- ═══════════════════ 侧边栏 ═══════════════════ -->
+<aside id="sidebar" class="flex flex-col overflow-hidden relative z-10 shrink-0 transition-all" style="width:180px;min-width:180px;background:var(--color-surface-alt);border-right:1px solid var(--color-border);transition-duration:var(--duration-normal);transition-timing-function:var(--ease-out);">
+
+  <button id="sidebarToggle" class="absolute w-6 h-6 flex items-center justify-center cursor-pointer z-10" style="top:10px;right:8px;border:none;background:none;color:var(--color-text-secondary);border-radius:var(--radius-sm);" title="折叠/展开">
+    <i data-lucide="panel-left" class="w-4 h-4"></i>
+  </button>
+
+  <!-- 展开状态内容 -->
+  <div id="sidebarExpanded" class="flex flex-col h-full">
+    <div class="px-2.5 pb-2 overflow-hidden" style="padding-top:40px;">
+      <div class="flex justify-between items-center mb-1.5" style="font-size:var(--font-size-sm);font-weight:600;color:var(--color-text-secondary);letter-spacing:0.5px;white-space:nowrap;">
+        <span>会话</span>
+        <button id="btnNewSession" class="cursor-pointer whitespace-nowrap" style="font-size:var(--font-size-xs);padding:4px 10px;border:1px solid var(--color-border);border-radius:5px;background:var(--color-surface);color:var(--color-text-secondary);">+ 新建</button>
+      </div>
+      <div class="sidebar-item session-item active" data-sid="s1">
+        <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:var(--color-primary);"></span>
+        <span class="truncate">今天的闲聊</span>
+      </div>
+      <div class="sidebar-item session-item" data-sid="s2">
+        <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:var(--state-success);"></span>
+        <span class="truncate">昨天的讨论</span>
+      </div>
+      <div class="sidebar-item session-item" data-sid="s3">
+        <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:var(--state-warning);"></span>
+        <span class="truncate">属性调试</span>
+      </div>
+    </div>
+
+    <div class="mx-2.5 h-px" style="background:var(--color-border);"></div>
+
+    <div class="px-2.5 pb-2 overflow-hidden flex-1" style="padding-top:12px;">
+      <div class="flex justify-between items-center mb-1.5" style="font-size:var(--font-size-sm);font-weight:600;color:var(--color-text-secondary);letter-spacing:0.5px;white-space:nowrap;">
+        <span>角色</span>
+        <div class="flex gap-1">
+          <button id="btnNewPreset" class="cursor-pointer font-medium" style="font-size:var(--font-size-xs);padding:4px 6px;border:1px solid var(--color-border);border-radius:5px;background:var(--color-surface);color:var(--color-text-secondary);" title="新建角色">+</button>
+          <button id="btnSavePreset" class="cursor-pointer" style="font-size:var(--font-size-xs);padding:4px 6px;border:1px solid var(--color-border);border-radius:5px;background:var(--color-surface);color:var(--color-text-secondary);" title="保存当前为角色">⭐</button>
+          <button id="btnImportPreset" class="cursor-pointer" style="font-size:var(--font-size-xs);padding:4px 6px;border:1px solid var(--color-border);border-radius:5px;background:var(--color-surface);color:var(--color-text-secondary);" title="导入角色文件">📂</button>
+        </div>
+      </div>
+      <!-- 角色卡片 -->
+      <div class="preset-card role-card" data-preset="傲娇女友">
+        <img src="assets/avatar-preset-tsundere.jpg" alt="傲娇女友" class="w-6 h-6 rounded-full object-cover shrink-0" style="border:1.5px solid var(--color-primary-light);box-shadow:0 1px 3px rgba(74,55,40,0.08);">
+        <span class="truncate">傲娇女友</span>
+        <div class="preset-tooltip">
+          <span class="tooltip-pill" style="background:#F5E0DC;color:#C05A4E;">顺从 -100</span>
+          <span class="tooltip-pill" style="background:#FBE5E0;color:#C05A4E;">亲密 100</span>
+          <span class="tooltip-pill" style="background:#FFF0E8;color:#D4A857;">攻击 40</span>
+          <span class="tooltip-pill" style="background:#FFF0E8;color:#D4786E;">情绪 60</span>
+        </div>
+      </div>
+      <div class="preset-card role-card" data-preset="知性姐姐">
+        <img src="assets/avatar-preset-intellectual.jpg" alt="知性姐姐" class="w-6 h-6 rounded-full object-cover shrink-0" style="border:1.5px solid var(--color-primary-light);box-shadow:0 1px 3px rgba(74,55,40,0.08);">
+        <span class="truncate">知性姐姐</span>
+        <div class="preset-tooltip">
+          <span class="tooltip-pill" style="background:#E8E0F0;color:#6B5B8A;">文化 90</span>
+          <span class="tooltip-pill" style="background:#E0F0E8;color:#5A8A6B;">好奇 80</span>
+          <span class="tooltip-pill" style="background:#F5E0DC;color:#C05A4E;">幽默 40</span>
+          <span class="tooltip-pill" style="background:#E8F0FA;color:#5A7A9A;">社交 30</span>
+        </div>
+      </div>
+      <div class="preset-card role-card" data-preset="笨蛋⑨">
+        <img src="assets/avatar-preset-baka.jpg" alt="笨蛋⑨" class="w-6 h-6 rounded-full object-cover shrink-0" style="border:1.5px solid var(--color-primary-light);box-shadow:0 1px 3px rgba(74,55,40,0.08);">
+        <span class="truncate">笨蛋⑨</span>
+        <div class="preset-tooltip">
+          <span class="tooltip-pill" style="background:#D0F0FF;color:#00BFFF;">文化 -100</span>
+          <span class="tooltip-pill" style="background:#E0F0E8;color:#5A8A6B;">好奇 100</span>
+          <span class="tooltip-pill" style="background:#FFF0E8;color:#D4A857;">幽默 60</span>
+          <span class="tooltip-pill" style="background:#E8F0FA;color:#5A7A9A;">社交 30</span>
+        </div>
+      </div>
+      <div class="preset-card role-card" data-preset="冰山美人">
+        <img src="assets/avatar-preset-icequeen.jpg" alt="冰山美人" class="w-6 h-6 rounded-full object-cover shrink-0" style="border:1.5px solid var(--color-primary-light);box-shadow:0 1px 3px rgba(74,55,40,0.08);">
+        <span class="truncate">冰山美人</span>
+        <div class="preset-tooltip">
+          <span class="tooltip-pill" style="background:#E8ECF0;color:#5A6A7A;">理智 -100</span>
+          <span class="tooltip-pill" style="background:#E8ECF0;color:#5A6A7A;">攻击 -100</span>
+          <span class="tooltip-pill" style="background:#E8ECF0;color:#5A6A7A;">顺从 -100</span>
+          <span class="tooltip-pill" style="background:#E8ECF0;color:#5A6A7A;">社交 -100</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-auto px-2 pb-2 text-center" style="font-size:var(--font-size-xs);color:var(--color-text-muted);line-height:1.5;letter-spacing:0.5px;white-space:nowrap;border-top:1px solid var(--color-border);padding-top:10px;">
+      luyi14og 出品<br>开源项目
+    </div>
+  </div>
+
+  <!-- 折叠状态标签 -->
+  <div id="sidebarCollapsed" class="hidden flex-col items-center" style="padding-top:44px;gap:14px;">
+    <span style="writing-mode:vertical-rl;font-size:10px;color:var(--color-text-muted);letter-spacing:2px;">会话</span>
+    <span style="writing-mode:vertical-rl;font-size:10px;color:var(--color-text-muted);letter-spacing:2px;">角色</span>
+  </div>
+</aside>
+
+<!-- ═══════════════════ 聊天区 ═══════════════════ -->
+<div class="flex-1 flex flex-col min-w-0">
+  <!-- 工具栏 -->
+  <div class="flex items-center gap-4 px-4 flex-shrink-0" style="padding-top:10px;padding-bottom:10px;border-bottom:1px solid var(--color-border);font-size:var(--font-size-sm);">
+    <span id="sessionTitle" class="font-semibold flex-1 truncate" style="font-size:var(--font-size-md);color:var(--color-text);">今天的闲聊</span>
+    <label class="flex items-center gap-1.5 cursor-pointer" style="color:var(--color-text-secondary);font-size:var(--font-size-sm);">
+      <input type="checkbox" id="showInner" style="accent-color:var(--color-primary);"> 内心独白
+    </label>
+    <label class="flex items-center gap-1.5 cursor-pointer" style="color:var(--color-text-secondary);font-size:var(--font-size-sm);">
+      <input type="checkbox" id="streamMode" checked style="accent-color:var(--color-primary);"> 流式
+    </label>
+    <button id="btnOpenSettings" title="API 设置" class="flex items-center justify-center cursor-pointer" style="width:28px;height:28px;border:none;background:none;color:var(--color-text-secondary);border-radius:var(--radius-sm);">
+      <i data-lucide="settings" class="w-4 h-4"></i>
+    </button>
+  </div>
+
+  <!-- 消息区 -->
+  <div id="chatMsgs" class="flex-1 overflow-y-auto px-5 flex flex-col" style="padding-top:16px;padding-bottom:16px;gap:10px;">
+
+    <!-- 空状态 -->
+    <div id="emptyState" class="flex flex-col items-center justify-center h-full" style="gap:16px;">
+      <div class="flex flex-col items-center" style="gap:24px;">
+        <div class="relative" style="width:100px;height:100px;">
+          <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle, var(--color-primary-light) 0%, transparent 70%);opacity:0.5;"></div>
+          <div class="absolute rounded-full" style="top:8px;left:50%;margin-left:-2px;width:4px;height:4px;background:var(--color-primary);opacity:0.6;animation:sparkleFloat 2s ease-in-out infinite;"></div>
+          <div class="absolute rounded-full" style="top:20px;right:20px;width:3px;height:3px;background:var(--state-warning);opacity:0.5;animation:sparkleFloat 2.5s ease-in-out 0.5s infinite;"></div>
+          <div class="absolute rounded-full" style="bottom:25px;left:18px;width:3px;height:3px;background:var(--color-primary);opacity:0.4;animation:sparkleFloat 3s ease-in-out 1s infinite;"></div>
+          <img src="assets/avatar-miss-default.jpg" alt="MISS" class="w-full h-full rounded-full object-cover" style="border:2px solid var(--color-primary-light);box-shadow:0 2px 8px rgba(74,55,40,0.08);">
+        </div>
+        <div class="flex flex-col items-center" style="gap:8px;">
+          <span class="text-center" style="font-size:var(--font-size-lg);font-weight:600;color:var(--color-text);">和 MISS 开始一段对话吧 ✦</span>
+          <span style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">选择一个角色，或直接发送消息</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 输入区 -->
+  <div class="flex items-center gap-2 px-4 flex-shrink-0 relative" style="padding-top:10px;padding-bottom:10px;border-top:1px solid var(--color-border);">
+    <button class="emoji-picker-btn flex items-center justify-center cursor-pointer shrink-0" title="表情" style="width:34px;height:34px;border:none;background:none;font-size:18px;border-radius:var(--radius-md);">
+      <i data-lucide="smile" class="w-5 h-5" style="color:var(--color-text-secondary);"></i>
+    </button>
+    <button id="btnImageUpload" class="flex items-center justify-center cursor-pointer shrink-0" title="发送图片" style="width:34px;height:34px;border:1px solid var(--color-border);border-radius:50%;background:none;font-size:16px;color:var(--color-text-secondary);">
+      <i data-lucide="image" class="w-4 h-4"></i>
+    </button>
+    <input type="text" id="msgInput" placeholder="输入消息，按 Enter 发送..." class="flex-1 px-3.5 outline-none" style="padding-top:10px;padding-bottom:10px;border:1px solid var(--color-border);border-radius:var(--radius-xl);font-size:var(--font-size-base);background:var(--color-surface);color:var(--color-text);font-family:var(--font-sans);">
+    <button id="sendBtn" class="cursor-pointer font-medium transition-colors shrink-0" style="padding:10px 20px;border:none;border-radius:var(--radius-xl);background:var(--color-primary);color:#fff;font-size:var(--font-size-base);transition-duration:var(--duration-normal);transition-timing-function:var(--ease-out);">发送</button>
+
+    <!-- 表情面板 -->
+    <div id="emojiPanel" class="emoji-panel hidden flex-wrap absolute z-[100]" style="bottom:56px;left:16px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:10px;box-shadow:0 4px 16px rgba(74,55,40,0.12);padding:8px;width:280px;gap:2px;">
+      <span class="emoji-item" data-emoji="😊">😊</span><span class="emoji-item" data-emoji="😂">😂</span><span class="emoji-item" data-emoji="❤️">❤️</span><span class="emoji-item" data-emoji="🥰">🥰</span><span class="emoji-item" data-emoji="😭">😭</span><span class="emoji-item" data-emoji="😡">😡</span><span class="emoji-item" data-emoji="👍">👍</span><span class="emoji-item" data-emoji="😎">😎</span>
+      <span class="emoji-item" data-emoji="🤔">🤔</span><span class="emoji-item" data-emoji="😴">😴</span><span class="emoji-item" data-emoji="🎉">🎉</span><span class="emoji-item" data-emoji="💪">💪</span><span class="emoji-item" data-emoji="🔥">🔥</span><span class="emoji-item" data-emoji="🌈">🌈</span><span class="emoji-item" data-emoji="💖">💖</span><span class="emoji-item" data-emoji="✨">✨</span>
+      <span class="emoji-item" data-emoji="😅">😅</span><span class="emoji-item" data-emoji="🙏">🙏</span><span class="emoji-item" data-emoji="🤗">🤗</span><span class="emoji-item" data-emoji="💔">💔</span><span class="emoji-item" data-emoji="🌹">🌹</span><span class="emoji-item" data-emoji="💡">💡</span><span class="emoji-item" data-emoji="🏆">🏆</span><span class="emoji-item" data-emoji="🎵">🎵</span>
+      <span class="emoji-item" data-emoji="☀️">☀️</span><span class="emoji-item" data-emoji="🌙">🌙</span><span class="emoji-item" data-emoji="🍰">🍰</span><span class="emoji-item" data-emoji="☕">☕</span><span class="emoji-item" data-emoji="🎮">🎮</span><span class="emoji-item" data-emoji="📚">📚</span><span class="emoji-item" data-emoji="🎨">🎨</span><span class="emoji-item" data-emoji="🐱">🐱</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 属性面板 ═══════════════════ -->
+<aside class="flex flex-col px-3 overflow-y-auto shrink-0" style="width:195px;min-width:195px;background:var(--color-surface);border-left:1px solid var(--color-border);padding-top:14px;padding-bottom:14px;">
+
+  <!-- ⑨模式徽章 -->
+  <div id="cirnoBadge" class="cirno-badge hidden text-center mb-2.5 px-2 py-1 rounded-md font-semibold text-white" style="font-size:var(--font-size-xs);background:linear-gradient(135deg, var(--color-cirno-light), var(--color-cirno-blue));">
+    <span class="cirno-sparkle">❄</span> ⑨模式 已激活 <span class="cirno-sparkle">❄</span>
+  </div>
+
+  <div class="text-center font-semibold mb-3.5" style="font-size:var(--font-size-sm);color:var(--color-text);">属性调节</div>
+
+  <div id="attrContainer">
+    <div class="attr-row">
+      <div class="attr-label">理智←→情绪<span class="attr-dirty-dot" id="d_rational_emotional"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="rational_emotional">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="rational_emotional">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">意志力<span class="attr-dirty-dot" id="d_willpower"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="willpower">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="willpower">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">独立←→顺从<span class="attr-dirty-dot" id="d_independent_submissive"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="independent_submissive">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="independent_submissive">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">文化水平<span class="attr-dirty-dot" id="d_education_level"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" id="sl_education_level" min="-100" max="100" value="0" data-attr="education_level">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="education_level">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">亲密度<span class="attr-dirty-dot" id="d_intimacy"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider intimacy-slider" min="0" max="100" value="0" data-attr="intimacy">
+        <input type="number" class="attr-num-input" min="0" max="100" value="0" data-attr="intimacy">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">好奇心<span class="attr-dirty-dot" id="d_curiosity"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="curiosity">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="curiosity">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">幽默感<span class="attr-dirty-dot" id="d_humor"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="humor">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="humor">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">攻击性<span class="attr-dirty-dot" id="d_aggression"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="aggression">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="aggression">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">社交能量<span class="attr-dirty-dot" id="d_social_energy"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="social_energy">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="social_energy">
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-label">冒险精神<span class="attr-dirty-dot" id="d_adventurousness"></span></div>
+      <div class="attr-value-row">
+        <input type="range" class="attr-slider" min="-100" max="100" value="0" data-attr="adventurousness">
+        <input type="number" class="attr-num-input" min="-100" max="100" value="0" data-attr="adventurousness">
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-1.5" style="margin-top:10px;">
+    <button id="btnReset" class="flex-1 cursor-pointer font-medium transition-colors" style="padding:7px 0;border:none;border-radius:var(--radius-md);font-size:var(--font-size-sm);background:var(--color-surface-alt);color:var(--color-text-secondary);">重置</button>
+    <button id="btnApply" class="flex-1 cursor-pointer font-medium transition-colors" style="padding:7px 0;border:none;border-radius:var(--radius-md);font-size:var(--font-size-sm);background:var(--color-primary);color:#fff;">应用</button>
+  </div>
+</aside>
+
+</main>
+
+<!-- ═══════════════════ 右键菜单 ═══════════════════ -->
+<div id="ctxMenu" class="context-menu fixed z-[1000] hidden p-1" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);box-shadow:var(--shadow-float);min-width:130px;">
+  <div id="ctxMenuApply" class="px-3 py-1.5 cursor-pointer rounded" style="font-size:var(--font-size-sm);color:var(--color-text);">应用</div>
+  <div id="ctxMenuExport" class="px-3 py-1.5 cursor-pointer rounded" style="font-size:var(--font-size-sm);color:var(--color-text);">导出 JSON</div>
+  <div id="ctxMenuDelete" class="danger px-3 py-1.5 cursor-pointer rounded" style="font-size:var(--font-size-sm);color:var(--state-error);">删除</div>
+</div>
+
+<!-- ═══════════════════ 图片预览弹窗 ═══════════════════ -->
+<div id="imgOverlay" class="hidden fixed inset-0 z-[3000] flex items-center justify-center cursor-pointer" style="background:rgba(0,0,0,0.7);">
+  <img id="imgPreview" src="" alt="预览" class="max-w-[85vw] max-h-[85vh] rounded-lg" style="box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+</div>
+
+<!-- ═══════════════════ Toast ═══════════════════ -->
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 px-4.5 py-2 rounded-[20px] z-[2000] opacity-0 pointer-events-none transition-opacity" style="font-size:var(--font-size-sm);transition-duration:var(--duration-normal);"></div>
+
+<!-- ═══════════════════ API 设置弹窗 ═══════════════════ -->
+<div id="settingsModal" class="hidden fixed inset-0 z-[2500] flex items-center justify-center" style="background:rgba(0,0,0,0.4);">
+  <div class="rounded-xl p-5" style="background:var(--color-surface);border:1px solid var(--color-border);box-shadow:var(--shadow-lg);width:380px;max-width:90vw;">
+    <div class="flex justify-between items-center mb-4">
+      <span class="font-semibold" style="font-size:var(--font-size-md);color:var(--color-text);">API 设置</span>
+      <button id="btnCloseSettings" class="cursor-pointer" style="border:none;background:none;font-size:18px;color:var(--color-text-muted);line-height:1;">✕</button>
+    </div>
+    <div class="flex flex-col gap-3">
+      <div>
+        <label class="block mb-1" style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">API Key</label>
+        <input id="settingsApiKey" type="password" placeholder="sk-..." class="w-full px-3 py-2 rounded-md outline-none" style="border:1px solid var(--color-border);font-size:var(--font-size-base);background:var(--color-bg);color:var(--color-text);">
+        <div class="flex items-center gap-2 mt-1">
+          <input id="showApiKey" type="checkbox" style="accent-color:var(--color-primary);">
+          <label for="showApiKey" style="font-size:var(--font-size-xs);color:var(--color-text-secondary);cursor:pointer;">显示密钥</label>
+        </div>
+      </div>
+      <div>
+        <label class="block mb-1" style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">API Base URL <span style="color:var(--color-text-muted);">（可选）</span></label>
+        <input id="settingsBaseUrl" type="text" placeholder="https://api.openai.com/v1" class="w-full px-3 py-2 rounded-md outline-none" style="border:1px solid var(--color-border);font-size:var(--font-size-base);background:var(--color-bg);color:var(--color-text);">
+        <div style="font-size:var(--font-size-xs);color:var(--color-text-muted);margin-top:2px;">留空使用默认 OpenAI / 填写中转地址</div>
+      </div>
+      <div>
+         <label class="block mb-1" style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">模型</label>
+         <select id="settingsModel" class="w-full px-3 py-2 rounded-md outline-none" style="border:1px solid var(--color-border);font-size:var(--font-size-base);background:var(--color-bg);color:var(--color-text);appearance:auto;">
+           <option value="gpt-4o-mini">OpenAI — gpt-4o-mini（最快）</option>
+           <option value="gpt-4o">OpenAI — gpt-4o（最强）</option>
+           <option value="deepseek-v4-flash">DeepSeek — v4-flash（最快）</option>
+          <option value="deepseek-v4-pro">DeepSeek — v4-pro（最强）</option>
+           <option value="__custom__">✎ 自定义模型名...</option>
+         </select>
+         <input id="settingsModelCustom" type="text" placeholder="输入自定义模型名" class="hidden w-full px-3 py-2 mt-2 rounded-md outline-none" style="border:1px solid var(--color-border);font-size:var(--font-size-base);background:var(--color-bg);color:var(--color-text);">
+       </div>
+    </div>
+    <div class="flex justify-end gap-2" style="margin-top:16px;">
+      <button id="btnCancelSettings" class="cursor-pointer px-4 py-2 rounded-md" style="border:1px solid var(--color-border);background:var(--color-surface-alt);color:var(--color-text-secondary);font-size:var(--font-size-sm);">取消</button>
+      <button id="btnSaveSettings" class="cursor-pointer px-4 py-2 rounded-md text-white font-medium" style="border:none;background:var(--color-primary);font-size:var(--font-size-sm);">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 新建角色弹窗 ═══════════════════ -->
+<div id="newPresetModal" class="hidden fixed inset-0 z-[2600] flex items-center justify-center" style="background:rgba(0,0,0,0.4);">
+  <div class="rounded-xl p-5" style="background:var(--color-surface);border:1px solid var(--color-border);box-shadow:var(--shadow-lg);width:420px;max-width:90vw;">
+    <div class="flex justify-between items-center mb-4">
+      <span class="font-semibold" style="font-size:var(--font-size-md);color:var(--color-text);">✦ 创建新角色</span>
+      <button id="btnCloseNewPreset" class="cursor-pointer" style="border:none;background:none;font-size:18px;color:var(--color-text-muted);line-height:1;">✕</button>
+    </div>
+    <div class="flex flex-col gap-3">
+      <div>
+        <label class="block mb-1" style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">角色名称</label>
+        <input id="newPresetName" type="text" placeholder="例如：傲娇猫娘" class="w-full px-3 py-2 rounded-md outline-none" style="border:1px solid var(--color-border);font-size:var(--font-size-base);background:var(--color-bg);color:var(--color-text);">
+      </div>
+      <div>
+        <label class="block mb-1" style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">角色描述 <span style="color:var(--color-text-muted);">（AI 根据描述自动分析属性）</span></label>
+        <textarea id="newPresetDesc" placeholder="描述角色性格...如：傲娇猫娘，喜欢撒娇但嘴上不承认，好奇心强，对主人特别依赖" rows="3" class="w-full px-3 py-2 rounded-md outline-none" style="border:1px solid var(--color-border);font-size:var(--font-size-base);background:var(--color-bg);color:var(--color-text);resize:vertical;"></textarea>
+      </div>
+      <div>
+        <label class="block mb-1" style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">人物背景 <span style="color:var(--color-text-muted);">（可选）</span></label>
+        <textarea id="newPresetBackground" placeholder="写出她的人物背景故事..." rows="2" class="w-full px-3 py-2 rounded-md outline-none" style="border:1px solid var(--color-border);font-size:var(--font-size-base);background:var(--color-bg);color:var(--color-text);resize:vertical;"></textarea>
+      </div>
+    </div>
+    <div class="flex justify-between items-center" style="margin-top:16px;">
+      <span id="newPresetStatus" style="font-size:var(--font-size-xs);color:var(--color-text-muted);"></span>
+      <div class="flex gap-2">
+        <button id="btnCancelNewPreset" class="cursor-pointer px-4 py-2 rounded-md" style="border:1px solid var(--color-border);background:var(--color-surface-alt);color:var(--color-text-secondary);font-size:var(--font-size-sm);">取消</button>
+        <button id="newPresetBtn" class="cursor-pointer px-4 py-2 rounded-md text-white font-medium" style="border:none;background:var(--color-primary);font-size:var(--font-size-sm);">✨ 生成并创建</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script src="assets/tailwind.browser.min.js"></script>
+    <script src="assets/lucide.min.js"></script>
+    <script src="store.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
