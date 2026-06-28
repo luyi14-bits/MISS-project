@@ -74,10 +74,9 @@ vector_db/
 !tests/data/*.db
 
 # ========================================
-# Tool States (TRAE internal)
+# Tool States (internal)
 # ========================================
 .superpowers/
-.trae/
 
 # ========================================
 # 不上传
