@@ -228,6 +228,94 @@ await Task.Run(() => File.WriteAllText(path, json));
 
 ---
 
+## 第十二荣（新增）：XAML 资源路径正确引用
+## 第十二耻：绝对路径 `/Resources/` 硬编码导致 publish 崩溃
+
+**后果**：`Source="/Resources/Images/p-tsundere.jpg"` 在 Visual Studio 开发环境正常（编译期嵌入），但在 `dotnet publish --self-contained` 后抛 IOException——路径在自包含产物中不存在。
+
+**MISS 项目实例**：CRASH-003 — 发布后所有角色头像无法显示，根因是 XAML 中使用了 `/Resources/` 绝对路径。修复方案改用文件系统路径 + `File.Exists()`。
+
+**正确做法**：
+```csharp
+// ❌ 绝对路径（dev 正常，publish 崩溃）
+<Image Source="/Resources/Images/p-tsundere.jpg"/>
+
+// ✅ 文件系统路径（需在 code-behind 中动态设置）
+public static string ResolveImagePath(string name)
+{
+    var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+    var path = Path.Combine(baseDir, "Resources", "Images", name);
+    return File.Exists(path) ? path : Path.Combine(baseDir, "Resources", "Images", "avatar-miss-default.jpg");
+}
+```
+
+> **规则**：XAML 中**禁止**使用 `/Resources/` 绝对路径。所有图片资源必须通过 `Path.Combine(BaseDir, ...)` 指向文件系统。
+
+---
+
+## 第十三荣（新增）：pythonnet 桥接模式
+## 第十三耻：多线程同时持 GIL，死锁崩全局
+
+**后果**：C# 多个线程同时调用 Python 函数 → `Py.GIL()` 竞争 → 循环等待 → GUI 完全冻结 → 用户强关进程。
+
+**MISS 项目实例**：PythonBridge 设计为**单 STA 线程**处理所有 Python 调用。BlockingCollection 投递 Queue 串行化，`TaskCompletionSource` 桥接异步等待。
+
+**正确做法**：
+```csharp
+// PythonBridge — 单线程 GIL 模式
+private static BlockingCollection<Action> _workQueue = new();  // 单生产者单消费者
+
+private static void WorkerThread()
+{
+    while (true)
+    {
+        var action = _workQueue.Take();           // 阻塞等待
+        using (Py.GIL())                           // 获取 GIL
+        {
+            action();                              // 串行执行 Python 调用
+        }
+    }                                              // 释放 GIL
+}
+
+// 调用方（UI 线程）
+public static async Task<ChatResponse> ChatAsync(...)
+{
+    var tcs = new TaskCompletionSource<ChatResponse>();
+    _workQueue.Add(() => {
+        var bridge = Py.Import("services.desktop_bridge");
+        var result = bridge.InvokeMethod("chat", ...);
+        tcs.TrySetResult(result);                  // 工作线程返回结果
+    });
+    return await tcs.Task;                         // UI 线程 await
+}
+```
+
+> **规则**：C# ↔ Python 调用必须走单一线程串行化 GIL。`BlockingCollection` + `Py.GIL()` + `TaskCompletionSource` 三件套。
+
+---
+
+## 第十四荣（新增）：LiteDB 写入隔离 + 加密
+## 第十四耻：UI 线程操作 LiteDB，API Key 明文落盘
+
+**后果**：`SaveSettings` 序列化后 openai_api_key 明文在 JSON 中 → 任何有文件读取权限的进程可窃取。UI 线程直接操作 LiteDB → UI 卡顿。
+
+**MISS 项目实例**：S17/S19 — 对话内容明文 BSON + API Key 明文落盘。修复：LiteDB 操作放 `Task.Run` + PythonBridge.EncryptMessage 调用 crypto.encrypt。
+
+**正确做法**：
+```csharp
+// ❌ 明文 + 同步
+db.GetCollection<BsonDocument>("messages").Insert(doc);
+
+// ✅ 加密 + 异步
+var encrypted = await PythonBridge.EncryptMessageAsync(spoken);
+doc["Text"] = encrypted;
+await Task.Run(() => db.GetCollection<BsonDocument>("messages").Insert(doc));
+```
+
+> **规则**：LiteDB 写入必须放 `Task.Run`。敏感字段（Text/InnerThought/API Key）必须先加密再写入。
+
+---
+
 ## 安全红线（不可协商）
 
 以下行为 **零容忍**，发现即打回：
@@ -242,6 +330,9 @@ await Task.Run(() => File.WriteAllText(path, json));
 | 6 | 绕过 `AuthMiddleware` 的公开路径过多 | AuthMiddleware |
 | 7 | `json.loads` 失败后 LLM 原文当 spoken → system prompt 泄漏 | fix-llm-api-compat 🔴 |
 | 8 | `except Exception: pass` 静默吞异常，线上问题无法排查 | desktop-polish 🟡 |
+| 9 | XAML `/Resources/` 绝对路径 → publish 后抛 IOException | CRASH-003 🔴 |
+| 10 | UI 线程直接操作 LiteDB → 界面冻结 + API Key 明文落盘 | S17/S19 🟠 |
+| 11 | 多线程同时持 GIL → 死锁 → GUI 冻结 | pythonnet 架构 🟠 |
 
 ---
 
@@ -300,3 +391,6 @@ test     — 测试（test: add Level 3 fallback test case）
 11. **▸ 新：写了 except？ → 加 logging 了吗？绝不允许 `except: pass`** ← 新增
 12. **▸ 新：调了 LLM API？ → 有三条 fallback 路径吗？** ← 新增
 13. **▸ 新：C# 项目？ → IO/网络操作用 `Task.Run` 了吗？** ← 新增
+14. **▸ 新：XAML 资源引用？ → 用的是 `Path.Combine` 文件系统路径吗？** ← v3 新增
+15. **▸ 新：C# 调 Python？ → 走单线程 GIL 队列了吗？** ← v3 新增
+16. **▸ 新：存敏感数据？ → Fernet 加密了吗？** ← v3 新增

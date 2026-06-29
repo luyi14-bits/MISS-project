@@ -297,3 +297,130 @@ if getattr(sys, 'frozen', False):
 4. **每个漏洞必须有 PoC**（可复现的 curl/Python/C 代码）
 5. **不接受"可能""也许"** — 安全审查是精确科学。不确定时标注"未验证"而非"可能"
 6. **修复方案要具体到代码行**，不写"加强校验"这种空话
+
+---
+
+## 纵深防御体系（新增）
+
+安全审查必须覆盖 5 层防御，每层独立审计：
+
+```
+第 1 层：传输安全
+├── pythonnet 单进程嵌入（无网络端口暴露）
+├── 前端 API_BASE 仅 127.0.0.1:8000（回环绑定）
+└── CORS ALLOWED_ORIGINS 白名单 4 项
+
+第 2 层：认证鉴权
+├── AuthMiddleware — Bearer Token 校验
+├── PUBLIC_PATHS 白名单：/health /api/info /docs
+├── access_token 为空时自动 bypass（单用户模式）
+└── sk-placeholder 双检查
+
+第 3 层：应用安全
+├── Pydantic Field 强制校验（max_length / ge= / le=）
+├── slowapi 频率限制：10/min chat，5/min character
+├── instructor + pydantic 约束 LLM 输出 schema
+├── 三级 API fallback：TOOLS → JSON → Raw
+└── ⚠ 禁止原文透传（防 system prompt 泄漏）
+
+第 4 层：数据安全
+├── crypto.py — Fernet AES-128-CBC 加密对话内容
+├── LiteDB SaveMessages → EncryptMessage → Fernet
+├── API Key 仅 _runtime_overrides 内存持有（不落盘）
+└── SaveSettings 序列化前清除 openai_api_key
+
+第 5 层：运维安全
+├── build.ps1 — 4 阶段全自动零泄漏打包
+├── 打包前清空 publish/ 防旧残留
+├── .env* .db .pdb .instance .pyc 全覆盖清理
+└── Stage 4 自动验证 8+3+3 项关键产物
+```
+
+---
+
+## STRIDE 威胁模型分析（新增）
+
+每次安全审查的 Daniel Miessler 阶段必须完成 STRIDE 分析：
+
+| 威胁类别 | 检查问题 | MISS 缓解措施 |
+|----------|----------|--------------|
+| **Spoofing（伪装）** | 谁能冒充合法客户端？ | AuthMiddleware Bearer Token |
+| **Tampering（篡改）** | 数据能否被篡改？ | Fernet 加密使篡改不可读 |
+| **Repudiation（抵赖）** | 操作能否被追溯？ | logging 全覆盖（每处 except 都有日志） |
+| **Information Disclosure** | 敏感信息能否被窃取？ | 安全占位符 + 日志不记 Key + 加密存储 |
+| **Denial of Service** | 服务能否被耗尽？ | slowapi 限流 10/min per endpoint |
+| **Elevation of Privilege** | 权限能否被提升？ | 单用户 localhost，无提权路径 |
+
+---
+
+## 安全审计流程（新增）
+
+基于 MISS 项目 5 阶段审计经验（38 项修复），安全审查应按以下顺序执行：
+
+```
+阶段 1 — 基础设施审计
+├── 认证（是否有未鉴权的 API 端点？）
+├── 密钥泄露（API Key 是否在日志/响应/存储中透出？）
+├── 堆栈暴露（错误信息是否含内部路径？）
+├── CORS（白名单是否合理收紧？）
+├── 输入校验（每根端点是否有 max_length？）
+├── CSP（是否包含 unsafe-inline？）
+└── 速率限制（是否存在无保护的高频端点？）
+
+阶段 2 — 加密 + 限流
+├── 存储加密（是否所有敏感字段都已加密？）
+└── 频率限制（关键端点是否有独立限流配置？）
+
+阶段 3 — AI 生成代码审计
+├── 生成的代码是否符合项目安全规范？
+├── 是否有明文落盘路径？
+├── 异常消息是否泄露内部信息？
+└── _error 格式是否统一？
+
+阶段 4 — 可观测性加固
+├── 占位符检查是否一致（如 sk-placeholder 的双检查）？
+├── 降级路径是否有日志记录？
+├── 异常 catch 范围是否精确（不吞 MemoryError）？
+└── 未配置告警是否有 warning？
+
+阶段 5 — 去匿名化（发布前）
+├── 构建产物中是否有 .pdb 残留？
+├── 是否有 .env / .db / .instance 泄露？
+├── 旧构建目录是否清理？
+├── .gitignore 是否覆盖 obj/bin/publish？
+└── 所有文件引用是否为文件系统路径（非编译嵌入路径）？
+```
+
+---
+
+## 安全检查清单（新增）
+
+### 上线前检查（每次发布）
+
+- [ ] `build.ps1` Stage 4 全绿（8 项产物 + 3 项去匿名化）
+- [ ] `.pdb` `.env` `.db` `.instance` 零残留
+- [ ] `miss-backend/.env` 不存在
+- [ ] `dotnet build` 0 error
+- [ ] `pytest` ~190/190
+- [ ] `git status` clean（无未提交的 .env / .db）
+- [ ] `git ls-files | grep "\.pdb\|\.exe\|\.db\|\.sqlite3"` 返回空
+
+### 代码审核检查（每次 PR）
+
+- [ ] 新增端点有 `Field(max_length=)` 约束？
+- [ ] 新增 except 有 `logging.warning/error`？
+- [ ] 新增 LLM 调用走 `LLMCaller.call()` 而非直接 SDK？
+- [ ] 新增 JSON 解析有 `json.JSONDecodeError` catch？
+- [ ] 返回用户的内容经过了 `escapeHtml()` 或等效转义？
+- [ ] 日志中不含 API Key / Token / 用户消息内容？
+- [ ] 不返回 `_diag` / `traceback` / 内部路径？
+- [ ] 非白名单路径有 Bearer Token 校验？
+
+### 密钥安全清单
+
+- [ ] `.env` 在 `.gitignore` 中
+- [ ] API Key 仅内存持有（`_runtime_overrides`），不落盘
+- [ ] 序列化前清除 `openai_api_key`
+- [ ] `settings GET` 仅返回 `openai_api_key_set: bool`
+- [ ] 无 `print(api_key)` / `console.log(api_key)`
+- [ ] `MISS_FERNET_KEY` 环境变量已设置（生产）

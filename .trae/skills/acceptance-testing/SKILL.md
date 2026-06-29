@@ -17,6 +17,52 @@ description: "MISS project rigorous acceptance testing methodology. Invoke when 
 
 ---
 
+## 一甲（新增）：验收人准则
+
+验收人不写代码，只做三件事：
+
+1. **逐文件读回** — 独立打开修复工程师声称修改的文件，逐行对照修复声明
+2. **实测执行** — `dotnet build` / `dotnet publish` / `pytest` / 手动启动，验证运行时行为
+3. **证据可视化** — 每一项 PASS/FAIL 必须带有 `file:///` 绝对路径 + 行号引用，可 Ctrl+Click 跳转
+
+**铁律：永远不信任修复工程师的声明。** 修复组声称"FULL PASS"、"全部通过"、"零遗留"，验收人必须以最坏情况心态独立验证：
+
+| 修复组声明 | 验收人动作 |
+|-----------|-----------|
+| "pytest 189/189" | 自己跑 `pytest -q` |
+| "dotnet build 0 error" | 自己跑 `dotnet build -c Release` |
+| "ContentRendered → 正常启动" | 自己 `dotnet publish` → 双击 `MISS.exe` → 计时 |
+| "LiteDbLocalStore 加密了" | 自己读 `SaveSettings` 函数 |
+
+> MISS 项目历史上发生过多次"修复组报告 PASS 但验收人实测发现未修"的情况——这恰好证明了独立验收的必要性。
+
+---
+
+## 一乙（新增）：三层覆盖模型
+
+```
+┌─────────────────────────────────────────┐
+│  Kent Beck                               │
+│  单元测试  ── 字段边界 / 解析器 / 模型   │
+│  方法论：等价类划分 / 边界值 / 异常路径  │
+├─────────────────────────────────────────┤
+│  Brian Okken                             │
+│  pytest 架构 ── fixture / parametrize    │
+│  审查：conftest 分层 / scope / 回归链    │
+├─────────────────────────────────────────┤
+│  Simon Stewart                           │
+│  E2E/UI  ── publish 启动 / 窗口渲染      │
+│  原则：E2E 只测关键路径 3-5 条           │
+└─────────────────────────────────────────┘
+```
+
+**验收人必须将问题归类到对应层级**：
+- 单元错误 → Kent Beck 方法论
+- pytest 架构问题 → Brian Okken 方法论
+- E2E/UI 崩溃 → Simon Stewart 方法论
+
+---
+
 ## 二、验收报告标准结构
 
 每份验收报告必须包含以下章节（顺序固定）：
@@ -370,7 +416,91 @@ python -m pytest tests/acceptance_*.py -v --tb=short
 
 ---
 
-## 十七、核心检查清单
+## 十七（新增）：偏离 Spec 的处理
+
+如果修复方案与 spec 不同但更优，验收人必须：
+
+1. **明确标注** "偏离 spec，更优"
+2. **写对照** spec 方案 vs 实际方案对比表
+3. **确认无副作用**
+
+```markdown
+| 方案 | 实现方式 | 优点 | 风险 |
+|------|---------|------|------|
+| Spec 方案 | DeleteMany+Insert | 简单 | 并发丢失 |
+| 实际方案 | CollectionViewSource.Filter | 零拷贝 Filter | 已确认无副作用 |
+| **结论** | 偏离 spec，更优 ✅ | | |
+```
+
+---
+
+## 十八（新增）：双轨测试体系详解
+
+验收人必须清楚区分两种测试类型：
+
+### 18.1 Pytest 单元测试（`test_*.py`）
+
+| 特点 | 说明 |
+|------|------|
+| 文件数 | 13 个 |
+| 累计用例 | ~190 |
+| 运行命令 | `cd miss-backend && python -m pytest tests/ -q` |
+| 覆盖范围 | 纯 Python + pytest，不依赖外部 API |
+| 覆盖方法 | parametrize 驱动全量覆盖（禁止抽样） |
+| 回归要求 | 每次 PR 必须保持 100% 通过率 |
+
+### 18.2 Acceptance 验收脚本（`acceptance_*.py`）
+
+| 特点 | 说明 |
+|------|------|
+| 文件数 | 17 个 |
+| 代码量 | ~3,900 行 |
+| 特点 | 独立 `if __name__ == "__main__"` 脚本，带 PASS/FAIL 计数 |
+| 组织方式 | 按 Phase/Task 组织，对应项目管理清单 |
+| 覆盖内容 | 逐项对照设计文档 |
+
+---
+
+## 十九（新增）：常见验收陷阱与教训
+
+验收人必须在每次验收前阅读以下 5 个陷阱：
+
+### 🪤 陷阱 1：相信修复组的 BUILD/PASS 声明
+
+**教训**：修复组提交 4 轮报告，每轮声称"FULL PASS / 全部通过"。验收人独立测试发现：
+- 第 3 轮：编译错误未修
+- 第 3 轮：`character.py` 绕过 LLMCaller 封装
+- 第 4 轮：`async void + await` 实测 publish 40s timeout
+
+**规则**：**永远自己跑 build / pytest / publish 启动。**
+
+### 🪤 陷阱 2：仅在 dev 环境测试
+
+**教训**：`ContentRendered` / `BeginInvoke` / `SynchronizationContext.Post` 在 Visual Studio 调试中正常工作，但在 `dotnet publish --self-contained` 后的 `MISS.exe` 中全部不触发。
+
+**规则**：**验收必须使用 `dotnet publish` 产物，而非 `bin/Debug` 目录。**
+
+### 🪤 陷阱 3：XAML 中的 Resource 路径
+
+**教训**：`Source="/Resources/Images/p-tsundere.jpg"` 在 dev 环境正常，但在 self-contained publish 中抛 IOException。
+
+**规则**：**所有图片资源必须用 `Path.Combine(BaseDir, ...)` 文件系统路径。**
+
+### 🪤 陷阱 4："Python 侧零改动" ≠ 零影响
+
+**教训**：C# 侧拼接 `sess_{Id}_{roleName}`，Python 侧 code 零改动。但 Python SQLite 中同一 session 历史消息会因 session_id 不同而物理隔离——需要验收人理解 Python 侧逻辑验证。
+
+**规则**：**"零改动" ≠ "零影响"。验收人必须理解 Python 侧逻辑，而不只看 diff。**
+
+### 🪤 陷阱 5：C# 单元测试零覆盖
+
+**教训**：MISS 的 WPF 桌面端 C# 单元测试零覆盖——这是已知缺陷。验收时必须人工验证所有 C# 路径。
+
+**规则**：**C# 代码必须手动验证。`dotnet build` 0 error 不等于逻辑正确。**
+
+---
+
+## 二十、核心检查清单（v2）
 
 每次验收前，验收人必须自检以下项：
 
@@ -382,8 +512,11 @@ python -m pytest tests/acceptance_*.py -v --tb=short
 - [ ] 每个问题有复现步骤 + 修复方案
 - [ ] 代码质量评价有亮点 + 需改进
 - [ ] Spec 对照审计完成（What Changes + Scenario + Impact diff）
-- [ ] pytest 全量回归 208/208 确认
+- [ ] pytest 全量回归确认（当前基准 ~190）
 - [ ] 旧 PASS 结论是否受影响声明
-- [ ] 验收结论明确（PASS 或 FAIL）
+- [ ] 验收结论明确（PASS / FAIL / CONDITIONAL PASS）
 - [ ] 所有文件引用使用 file:/// 绝对路径 + 行号
 - [ ] 报告末尾包含生成时间和验收人签名
+- [ ] **▸ 新：自己跑过 `dotnet build -c Release`？** ← 新增
+- [ ] **▸ 新：自己跑过 `dotnet publish` + 双击启动？** ← 新增
+- [ ] **▸ 新：阅读了「常见验收陷阱」5 条？** ← 新增
