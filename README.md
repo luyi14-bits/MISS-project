@@ -6,7 +6,7 @@
 
 **MISS**（**M**alleable **I**ntelligent **S**ynthetic **S**oul）是一个以双轨思维引擎驱动的 AI 角色对话框架。支持 10 维动态属性调节、14 个预设角色头像、知识天花板约束和⑨模式彩蛋。全栈 Python + ChromaDB + Jinja2 + FastAPI，桌面版 WPF（C#/.NET）+ pythonnet 单进程嵌入。AGPL v3 开源。
 
-pytest 全量 **208/208** 通过 | 验收报告 **40 个问题全部修复** ✅
+pytest 全量 **189/190** 通过 | 验收报告 **62 个问题全部追踪** | 安全等级 **A（38/38 修复）** ✅
 
 ---
 
@@ -204,10 +204,14 @@ MISS/
 │   ├── p-icequeen.jpg                #   冰山美人
 │   └── p-*.jpg                       #   8 个扩展角色
 │
-├── docs/                             # 项目文档
+├── docs/                             # 项目文档（含技术白皮书三件套）
+│   ├── 技术白皮书.md                   #   C#/Python 全栈架构（Beta v0.6）
+│   ├── 安全技术文档.md                 #   安全等级 A · 38 项修复 · 5 阶段审计
+│   ├── 验收测试技术文档.md              #   62 问题追踪 · 190 pytest · 双轨测试
 │   ├── AI伴侣系统提示词架构设计_完整版.docx
 │   ├── 任务拆分_代码实现清单.md
 │   ├── 安全开发规范_审计报告与修复方案.md
+│   ├── MISS_Alpha_v0.4_总裁报告.md
 │   └── 指导文件.doc
 │
 ├── 验收报告/                           # 各阶段验收报告（17 份，40 个问题全部修复）
@@ -298,22 +302,21 @@ MISS/
 │
 ├── build/                             # PyInstaller 打包 miss-server.exe
 ├── dist/                              # 打包分发包
-│
-└── .trae/                             # 项目工具链（不上传 Git）
+│   └── .trae/                             # 项目工具链（不上传 Git）
     ├── specs/                         #   Spec 任务卡（7 个功能模块）
     │   ├── fix-role-save-and-ui/       #     角色创建 + UI 修复 ✅
     │   ├── desktop-packaging/          #     Tauri 桌面版 v2 ✅
-    │   ├── desktop-rebuild/            #     WPF MVVM 重构 🔨 进行中
-    │   ├── desktop-polish/             #     桌面版细节打磨 📝
-    │   ├── fix-binding-and-api/        #     绑定 + API 修复 📝
-    │   ├── fix-llm-api-compat/         #     LLM API 兼容性修复 📝
-    │   └── fix-role-message-isolation/ #     角色消息隔离修复 📝
-    └── skills/                        #   项目 Skill 库（7 个团队角色规范）
-        ├── acceptance-testing/         #     验收报告编写标准
-        ├── coding-ethics/              #     编程八荣八耻（40 个问题提炼）
-        ├── project-secretary/          #     项目秘书（文件整理、管线维护、Skill 管理）
-        ├── security-academy/           #     安全专家组（Miessler/Kettle/Ormandy）
-        ├── spec-pipeline/              #     管线工程师（Spec → Tasks → Checklist）
+    │   ├── desktop-rebuild/            #     WPF MVVM 重构 ✅
+    │   ├── desktop-polish/             #     桌面版细节打磨 ✅
+    │   ├── fix-binding-and-api/        #     绑定 + API 修复 ✅
+    │   ├── fix-llm-api-compat/         #     LLM API 兼容性修复 ✅
+    │   └── fix-role-message-isolation/ #     角色消息隔离修复 📝 规划中
+    └── skills/                        #   项目 Skill 库（7 个团队角色规范 v3）
+        ├── acceptance-testing/         #     验收报告标准（v3：验收人准则+陷阱清单）
+        ├── coding-ethics/              #     编程八荣八耻（v3：XAML/线程安全/LiteDB）
+        ├── project-secretary/          #     项目秘书（文件整理、管线维护）
+        ├── security-academy/           #     安全专家组（v3：STRIDE+5层防御+审计流程）
+        ├── spec-pipeline/              #     管线工程师（v2：优先级矩阵+置信度审计）
         ├── test-driven-development/    #     测试专家组（Beck/Stewart/Okken）
         └── trinity-mentors/            #     AI/ML 导师团（Raschka/Karpathy/Lyalin）
 ```
@@ -327,11 +330,11 @@ MISS/
 ```
 █████████████████████████████████████████████
 █                                           █
-█   ALPHA v0.3 — 开发中                      █
+█   BETA v0.7 — 安全等级 A                    █
 █                                           █
-█   核心引擎完备（Phase 0-7 全部 PASS）。      █
-█   桌面版 WPF（pythonnet）开发中。            █
-█   pytest 208/208 全量通过。                █
+█   核心引擎 + 全部 Spec 已 PASS（24 项交付）。  █
+█   安全 5 阶段审计 38/38 修复完成。            █
+█   pytest 189+ / acceptance 3900+ 行。       █
 █   欢迎 Star / Watch 以跟踪进展。             █
 █                                           █
 █████████████████████████████████████████████
@@ -344,13 +347,18 @@ MISS/
 | 阶段 | 内容 | 状态 |
 |------|------|------|
 | **Phase 0-2** | 项目骨架 + 10 维属性引擎 + 双轨提示词模板 | ✅ PASS |
-| **Phase 3-4** | API 路由 + LLM 调用 + 记忆评分/摘要 + ChromaDB 向量化 | ✅ PASS |
-| **Phase 7** | 单元测试 + 集成测试（208/208 全量通过） | ✅ PASS |
-| **desktop-packaging** | Tauri 桌面版 v2（CSP 收敛 + 双通道启动） | ✅ PASS |
+| **Phase 3-4** | API 路由 + LLM 调用 + 记忆评分/摘要 + ChromaDB | ✅ PASS |
+| **Phase 7** | 单元测试 + 集成测试 | ✅ PASS |
 | **fix-role-save-and-ui** | 角色创建保存 + 全界面"角色"命名统一 | ✅ PASS |
-| **desktop-rebuild** | WPF MVVM 重构（pythonnet 单进程） | 🔨 进行中 |
-| **v0.4** | 竞品横向对比数据 + 技术博客 + WPF 桌面版收尾 | 📝 规划中 |
-| **v1.0** | 全功能 MCP Server 接口 + 社区预设市场 + 完整测试覆盖 | 💡 想法池 |
+| **desktop-packaging** | Tauri 桌面版 v2 | ✅ PASS |
+| **desktop-rebuild** | WPF MVVM 重构（pythonnet 单进程） | ✅ PASS |
+| **desktop-polish** | 全线 21 项修复（启动线程/主题/IO/日志/config） | ✅ PASS |
+| **fix-binding-and-api** | 推理模型兼容 + 属性面板/标题栏/设置持久化 | ✅ PASS |
+| **fix-llm-api-compat** | 三级 API fallback（TOOLS→JSON→Raw） | ✅ PASS |
+| **安全审计 5 阶段** | 认证·加密·限流·去匿名化·打包（38/38） | ✅ PASS |
+| **fix-role-message-isolation** | 角色切换消息隔离 | 📝 规划中 |
+| **v0.8** | C# 单元测试基础设施 + 角色隔离验收通过 | 📝 规划中 |
+| **v1.0** | 全功能 MCP Server + 社区预设市场 + 完整测试覆盖 | 💡 想法池 |
 
 ---
 
