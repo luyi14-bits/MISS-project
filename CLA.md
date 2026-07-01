@@ -74,19 +74,8 @@ This Agreement is governed by the laws of the People's Republic of China. This A
 
 ---
 
-## Signature
+## Acceptance
 
-By signing below, You agree to the terms of this Contributor License Agreement for all Contributions You make to the MISS project.
-
-| Field | Signature |
-|-------|-----------|
-| **Your Name** | ______________________________ |
-| **Date** | __________________ |
-| **Email Address** | ______________________________ |
-| **GitHub Username** | ______________________________ |
-| **Entity Name (if applicable)** | ______________________________ |
-| **Signature** | ______________________________ |
+By submitting a Contribution to MISS (including but not limited to pull requests, issues, code reviews, or any other project channel), You agree to the terms of this Contributor License Agreement. No physical or digital signature is required.
 
 **Thank you for contributing to MISS.**
-
-Please email the signed copy to: **luyi14bits@gmail.com**
