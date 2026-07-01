@@ -160,15 +160,27 @@ public static class AudioPlayer
 
 ---
 
+### Requirement: P6-R4 — AI 角色头像生成（竞品对标补齐）
+The system SHALL 通过调用 DALL·E / SD WebUI / CivitAI API 生成角色头像，并在 `RoleFactory.generate()` 返回的 `avatar_suggestion` 字段中自动生成 Stable Diffusion prompt。
+
+选型理由：竞品对标报告显示 **所有活跃竞品都有头像/Avatar**（Live2D 或静态图），MISS 当前只能显示默认占位图——这是交互沉浸感的最低配置缺失。
+
+实现：轻量级方案——使用 OpenAI `dall-e-3` API（`PythonBridge` 已有 `api_key`）生成 256x256 PNG。不追 Live2D（竞品报告 P2 决策：资源黑洞）。
+
+#### Scenario: 头像生成
+- **WHEN** 用户在创建角色窗口点击"AI 一键生成" → 生成角色后自动调用 DALL·E 生成头像
+- **THEN** 角色头像自动填充，存入 `%APPDATA%/MISS/avatars/{roleId}.png`
+
 ## Phase 5+6 Technical Notes
 
 | 技术点 | 决策 | 理由 |
 |--------|------|------|
 | 角色生成 | `instructor` + Pydantic + LLM | 与现有 llm_caller.py 统一 |
 | TTS 引擎 | Edge TTS（`edge-tts` pip） | 免费·离线·无 API Key·100+ 音色 |
+| 头像生成 | DALL·E 3 API | 复用现有 api_key · 不追 Live2D（竞品 P2 决策）|
 | 音频播放 | NAudio NuGet | 纯托管 .NET 音频库·MP3 原生支持 |
 | 领域约束 | System Prompt 前置注入 | 比以前的后处理过滤更自然 |
-| 角色识别 | 8 位 UUID（`Guid.ToString("N")[..8]`） | 简洁·冲突概率低·人类可读 |
+| 角色识别 | 8 位 UUID | 简洁·冲突概率低·人类可读 |
 
 ## Phase 5+6 Task Count
 

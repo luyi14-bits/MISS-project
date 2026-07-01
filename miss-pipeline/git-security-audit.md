@@ -1,7 +1,7 @@
 # Git 仓库安全审计报告 — G1-G3
 
 > **审查日期**：2026-06-28
-> **审查人**：security-academy（Daniel Miessler / James Kettle / Tavis Ormandy）
+> **审查人**：安全专家组（SDL · Web 安全 · 二进制安全）
 > **仓库**：`origin git@github.com:luyi14-bits/MISS-project.git`
 > **分支**：master · 2 commits
 
