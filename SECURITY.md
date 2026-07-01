@@ -3,7 +3,7 @@
 > **项目**：MISS — Malleable Intelligent Synthetic Soul  
 > **生效版本**：Beta v0.8  
 > **最后更新**：2026-07-01  
-> **安全等级**：A（38 项全修复 · 三专家联合签发）
+> **安全等级**：A（38 项全修复 · 全量审计覆盖）
 
 ---
 
@@ -169,6 +169,4 @@ SPDX 版权头规范见 [.trae/specs/fix-license-headers/spec.md](.trae/specs/fi
 
 ---
 
-> **安全顾问（SDL）**：安全不是一次性工程，是持续纪律。这份 Policy 是纪律的起点。  
-> **安全顾问（Web 安全）**：如果你找到了没在这里列出的漏洞，请报告。我们不会让它留在已发布的版本里。  
-> **安全顾问（二进制安全）**：你的代码跑在用户机器上。build.ps1 确保我们不会把 .pdb 和 .db 打包进去。基础工程做对了。
+MISS 是一个全栈 AI 角色对话桌面应用。安全审计覆盖 Python/C# 双语言、WPF 桌面端、FastAPI 后端、pythonnet 桥接、LLM API 集成五个攻击面。

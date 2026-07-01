@@ -103,6 +103,12 @@
                                         </Border>
                                     </StackPanel>
                                 </Border>
+                                <Button Content="🔊" Width="24" Height="24"
+                                        Style="{DynamicResource IconButtonStyle}" FontSize="10"
+                                        Margin="4,2,0,0"
+                                        Tag="{Binding Text}"
+                                        Click="PlayTts_Click"
+                                        ToolTip="播放语音"/>
                             </StackPanel>
                         </Grid>
                         <DataTemplate.Triggers>

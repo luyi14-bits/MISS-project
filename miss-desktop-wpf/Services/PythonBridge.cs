@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2026  MISS Project Contributors
+// Copyright (C) 2026  MISS Project Contributors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 using System.Collections.Concurrent;
@@ -208,6 +208,31 @@ public static class PythonBridge
         {
             dynamic crypto = Py.Import("services.crypto");
             return (string)crypto.decrypt(text);
+        });
+    }
+
+    public static Dictionary<string, object> GenerateRole(string seedText)
+    {
+        return RunOnPythonThread(() =>
+        {
+            dynamic bridge = Py.Import("services.desktop_bridge");
+            dynamic result = bridge.generate_role(seedText);
+            dynamic json_module = Py.Import("json");
+            string jsonStr = json_module.dumps(result).ToString() ?? "{}";
+            return JsonSerializer.Deserialize<Dictionary<string, object>>(jsonStr,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+        });
+    }
+
+    public static byte[] TtsSpeak(string text, string voice = "zh-CN-XiaoxiaoNeural")
+    {
+        if (string.IsNullOrEmpty(text)) return [];
+        return RunOnPythonThread(() =>
+        {
+            dynamic bridge = Py.Import("services.desktop_bridge");
+            var pyBytes = (Python.Runtime.PyObject)bridge.tts_speak(text, voice);
+            if (pyBytes == null || pyBytes.IsNone()) return [];
+            return pyBytes.As<byte[]>();
         });
     }
 

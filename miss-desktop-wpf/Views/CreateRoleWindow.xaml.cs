@@ -1,7 +1,6 @@
-﻿// Copyright (C) 2026  MISS Project Contributors
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
@@ -59,6 +58,56 @@ public partial class CreateRoleWindow : Window
         }
     }
 
+    private async void Generate_Click(object sender, RoutedEventArgs e)
+    {
+        var seed = SeedInput.Text.Trim();
+        if (string.IsNullOrEmpty(seed))
+        {
+            NotificationService.Error("请输入角色想法描述");
+            return;
+        }
+
+        GenerateBtn.IsEnabled = false;
+        GenerateBtn.Content = "生成中…";
+        StatusText.Text = "AI 正在分析...";
+
+        try
+        {
+            var result = await Task.Run(() => PythonBridge.GenerateRole(seed));
+            if (result.TryGetValue("_error", out var err) && err is bool b && b)
+            {
+                var msg = result.GetValueOrDefault("message", "生成失败")?.ToString() ?? "生成失败";
+                NotificationService.Error(msg);
+                return;
+            }
+
+            NameInput.Text = result.GetValueOrDefault("name", "")?.ToString() ?? "";
+            DescInput.Text = result.GetValueOrDefault("description", "")?.ToString() ?? "";
+            BgInput.Text = result.GetValueOrDefault("background", "")?.ToString() ?? "";
+
+            if (result.TryGetValue("profile", out var p) && p is JsonElement profile)
+            {
+                var profileDict = JsonSerializer.Deserialize<Dictionary<string, int>>(profile.GetRawText(),
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+                var stored = new MISSProfile();
+                foreach (var kv in profileDict)
+                    stored[kv.Key] = kv.Value;
+                Tag = stored;
+            }
+
+            StatusText.Text = "AI 生成完成，可手动调整";
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Error($"生成失败：{ex.Message}");
+        }
+        finally
+        {
+            GenerateBtn.IsEnabled = true;
+            GenerateBtn.Content = "🤖 AI 生成";
+        }
+    }
+
     private async void Create_Click(object sender, RoutedEventArgs e)
     {
         var name = NameInput.Text.Trim();
@@ -71,10 +120,13 @@ public partial class CreateRoleWindow : Window
 
         try
         {
-            var profile = new MISSProfile();
-            var attrs = await Task.Run(() => PythonBridge.AnalyzeCharacter(desc));
-            foreach (var kv in attrs)
-                profile[kv.Key] = kv.Value;
+            var profile = Tag is MISSProfile stored ? stored : new MISSProfile();
+            if (Tag == null)
+            {
+                var attrs = await Task.Run(() => PythonBridge.AnalyzeCharacter(desc));
+                foreach (var kv in attrs)
+                    profile[kv.Key] = kv.Value;
+            }
 
             var bg = BgInput.Text.Trim();
             CreatedRole = new RoleData

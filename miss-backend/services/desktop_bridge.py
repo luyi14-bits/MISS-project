@@ -182,7 +182,8 @@ def _chat_inner(session_id: str, message: str, profile_dict: dict, background: s
 
 
 async def _do_chat(session_id: str, message: str, profile: BridgeProfile, background: str) -> dict:
-    ctx = _prompt_builder.build_full(session_id, message, profile, background)
+    domains = profile.model_dump().get("allowed_domains", [])
+    ctx = _prompt_builder.build_full(session_id, message, profile, background, allowed_domains=domains)
     result = await _llm_caller.call(ctx["messages"])
 
     result = _knowledge_filter.filter_response(result, profile.education_level)
@@ -277,17 +278,30 @@ def analyze_character(description: str) -> Dict[str, int]:
         result = loop.run_until_complete(_llm_caller.analyze_character(description))
     finally:
         loop.close()
+    return result or {"_error": True, "message": "角色分析失败"}
 
-    if "_error" in result:
-        raise RuntimeError(result.get("message", "character analysis failed"))
 
-    from routers.character import ATTR_META
-    profile = {}
-    for name, _, lo, hi in ATTR_META:
-        val = int(result.get(name, 0))
-        profile[name] = max(lo, min(hi, val))
+def generate_role(seed_text: str) -> dict:
+    from services.role_factory import RoleFactory
+    factory = RoleFactory()
+    loop = asyncio.new_event_loop()
+    try:
+        asyncio.set_event_loop(loop)
+        result = loop.run_until_complete(factory.generate(seed_text))
+    finally:
+        loop.close()
+    return result
 
-    return profile
+
+def tts_speak(text: str, voice: str = "zh-CN-XiaoxiaoNeural") -> bytes:
+    from services.tts_engine import synthesize
+    loop = asyncio.new_event_loop()
+    try:
+        asyncio.set_event_loop(loop)
+        audio = loop.run_until_complete(synthesize(text, voice))
+    finally:
+        loop.close()
+    return audio
 
 
 def ping_test() -> dict:

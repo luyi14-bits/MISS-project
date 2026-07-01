@@ -21,11 +21,11 @@ class PromptBuilder:
         self._conversation_store = ConversationStore()
         self._vector_store = vector_store
 
-    def build(self, session_id: str, user_message: str, profile: MISSProfile, character_background: str = "") -> list[dict]:
-        result = self.build_full(session_id, user_message, profile, character_background)
+    def build(self, session_id: str, user_message: str, profile: MISSProfile, character_background: str = "", allowed_domains: list[str] | None = None) -> list[dict]:
+        result = self.build_full(session_id, user_message, profile, character_background, allowed_domains)
         return result["messages"]
 
-    def build_full(self, session_id: str, user_message: str, profile: MISSProfile, character_background: str = "") -> dict:
+    def build_full(self, session_id: str, user_message: str, profile: MISSProfile, character_background: str = "", allowed_domains: list[str] | None = None) -> dict:
         eggs = self._easter_egg_engine.evaluate(profile)
         cross_effects = self._cross_effect_calc.calculate(profile)
         attribute_xml = self._attribute_mapper.map_all(profile)
@@ -39,7 +39,12 @@ class PromptBuilder:
         if not recalled:
             recalled = self._conversation_store.recall(session_id, user_message)
 
-        system_prompt = self._render_template(profile, eggs, cross_effects, attribute_xml, recalled)
+        domain_constraint = ""
+        if allowed_domains:
+            from .knowledge_domain import build_domain_prompt
+            domain_constraint = build_domain_prompt(allowed_domains)
+
+        system_prompt = self._render_template(profile, eggs, cross_effects, attribute_xml, recalled, domain_constraint)
 
         if character_background and character_background.strip():
             system_prompt = f"【你的人物背景设定】\n{character_background.strip()}\n\n{system_prompt}"
@@ -76,6 +81,7 @@ class PromptBuilder:
         cross_effects: list[dict],
         attribute_xml: str,
         memories: list[dict],
+        domain_constraint: str = "",
     ) -> str:
         template = self._jinja_env.get_template("miss_system.j2")
         return template.render(
@@ -84,4 +90,5 @@ class PromptBuilder:
             cross_effects=cross_effects,
             attribute_xml=attribute_xml,
             memories=memories,
+            domain_constraint=domain_constraint,
         )

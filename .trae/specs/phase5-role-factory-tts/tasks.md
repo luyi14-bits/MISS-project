@@ -33,9 +33,10 @@
 
 - [ ] Task 6: TTS 引擎（Python 侧）
   - [ ] SubTask 6.1: pip install `edge-tts`
-  - [ ] SubTask 6.2: 创建 `services/tts_engine.py` → `TTSEngine.synthesize(text, voice)` → MP3 bytes
-  - [ ] SubTask 6.3: 创建 `routers/tts.py` → `POST /api/tts/synthesize`（body: `{text, voice}` → response: `audio/mpeg` stream）
-  - [ ] SubTask 6.4: `desktop_bridge.py` 新增 `tts_speak(text, voice)` → 同步封装返回 MP3 bytes
+  - [ ] SubTask 6.2: 创建 `services/tts_engine.py` → `TTSEngine` 抽象基类 + `EdgeTTSEngine` 实现
+  - [ ] SubTask 6.3: `EdgeTTSEngine` 代码注释标注"依赖微软 Edge TTS 非官方 WebSocket 端点，未来可能需要迁移"
+  - [ ] SubTask 6.4: 创建 `routers/tts.py` → `POST /api/tts/synthesize`（body: `{text, voice}` → response: `audio/mpeg` stream）
+  - [ ] SubTask 6.5: `desktop_bridge.py` 新增 `tts_speak(text, voice)` → 同步封装返回 MP3 bytes
 
 - [ ] Task 7: C# AudioPlayer
   - [ ] SubTask 7.1: NuGet 安装 `NAudio`
@@ -51,6 +52,21 @@
   - [ ] SubTask 9.1: 新增 `tests/test_tts_engine.py`（1 项：Edge TTS 可用性检查）
   - [ ] SubTask 9.2: dotnet build 0 error + pytest 全量
 
+- [ ] Task 10: AI 头像生成（P6-R4）
+  - [ ] SubTask 10.1: Python 侧 `services/avatar_generator.py` → `generate_avatar(prompt, role_id)` → 调 OpenAI DALL·E 3 API → 256x256 PNG → 存入 `%APPDATA%/MISS/avatars/{role_id}.png`
+  - [ ] SubTask 10.2: `Pillow` 处理图片缩放/格式转换
+  - [ ] SubTask 10.3: `desktop_bridge.py` 新增 `generate_avatar(seed_text, role_id)` → 返回头像本地路径
+  - [ ] SubTask 10.4: `RoleFactory.generate()` 最后一步调 `generate_avatar()` → `RoleData.AvatarPath` 自动填充
+  - [ ] SubTask 10.5: `CreateRoleWindow` 生成成功后 → `AvatarPath` 绑定到 Image 控件
+
+- [ ] Task 11: 打包与依赖审计（package-audit-pm.md）
+  - [ ] SubTask 11.1: `PyInstaller spec` 加 `--collect-all pydantic`（修复 pydantic-core 丢失）
+  - [ ] SubTask 11.2: `PyInstaller spec` 加 `Pillow` C 扩展 hook（`--collect-all PIL`）
+  - [ ] SubTask 11.3: `pip install edge-tts` 加入 `requirements.txt`
+  - [ ] SubTask 11.4: `pip install Pillow` 加入 `requirements.txt`（头像生成依赖）
+  - [ ] SubTask 11.5: 运行 `pipdeptree` 检查 instructor 依赖树——确认无 `anthropic` SDK 误入
+  - [ ] SubTask 11.6: `.csproj` NuGet 引用确认 `NAudio` + `LiteDB` 版本锁定
+
 # Task Dependencies
 - Task 2 依赖 Task 1（RoleFactory 生成的 RoleData 需要新字段）
 - Task 3 可并行于 Task 2
@@ -59,6 +75,8 @@
 - Task 7 无依赖
 - Task 8 依赖 Task 6 + Task 7
 - Phase 5 和 Phase 6 可完全并行
+- Task 10 依赖 Task 2（头像生成需要 RoleFactory 先跑完）
+- Task 11 依赖 Task 6 + 10（打包审计需在全部依赖安装后跑）
 
 # 工时估算
 | Task | 子任务数 | 估算人天 |
@@ -72,4 +90,6 @@
 | Task 7 (AudioPlayer) | 3 | 1.0 |
 | Task 8 (播放按钮) | 3 | 0.5 |
 | Task 9 (测试) | 2 | 0.5 |
-| **合计** | **29** | **7.5** |
+| Task 10 (头像生成) | 5 | 1.0 |
+| Task 11 (打包审计) | 6 | 0.5 |
+| **合计** | **40** | **9.0** |

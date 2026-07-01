@@ -315,7 +315,7 @@ MISS/
         ├── acceptance-testing/         #     验收报告标准（v3：验收人准则+陷阱清单）
         ├── coding-ethics/              #     编程八荣八耻（v3：XAML/线程安全/LiteDB）
         ├── project-secretary/          #     项目秘书（文件整理、管线维护）
-        ├── security-academy/           #     安全专家组（v3：STRIDE+5层防御+审计流程）
+        ├── security-academy/           #     全栈安全审计（STRIDE+5层防御+审计流程）
         ├── spec-pipeline/              #     管线工程师（v2：优先级矩阵+置信度审计）
         ├── test-driven-development/    #     测试专家组（Beck/Stewart/Okken）
         └── trinity-mentors/            #     AI/ML 导师团（Raschka/Karpathy/Lyalin）

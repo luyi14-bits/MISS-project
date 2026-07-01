@@ -1,9 +1,11 @@
-﻿// Copyright (C) 2026  MISS Project Contributors
+// Copyright (C) 2026  MISS Project Contributors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using MISS.Services;
 using MISS.ViewModels;
 
 namespace MISS.Views;
@@ -19,6 +21,25 @@ public partial class ConversationView : UserControl
     }
 
     private async void SendButton_Click(object sender, RoutedEventArgs e) => await SendMessage();
+
+    private async void PlayTts_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string text && !string.IsNullOrEmpty(text))
+        {
+            var voice = VM.CurrentRole?.VoicePreset;
+            if (string.IsNullOrEmpty(voice)) voice = "zh-CN-XiaoxiaoNeural";
+            btn.IsEnabled = false;
+            try
+            {
+                var mp3 = await Task.Run(() => PythonBridge.TtsSpeak(text, voice));
+                if (mp3.Length > 0)
+                    await AudioPlayer.PlayAsync(mp3);
+            }
+            catch { }
+            finally { btn.IsEnabled = true; }
+        }
+    }
+
     private void MessageInput_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.None)
