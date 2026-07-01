@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2026  MISS Project Contributors
+// Copyright (C) 2026  MISS Project Contributors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 using System.Collections.ObjectModel;
@@ -285,7 +285,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         try
         {
-            var resp = await Task.Run(() => PythonBridge.Chat(pySessionId, text, profile, background));
+            var resp = await Task.Run(() => PythonBridge.Chat(pySessionId, text, profile, background, _currentRole?.Tags));
 
             DispatcherHelper.Run(() =>
             {
@@ -352,7 +352,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             try
             {
-                foreach (var token in PythonBridge.ChatStream(pySessionId, text, profile, background))
+                foreach (var token in PythonBridge.ChatStream(pySessionId, text, profile, background, _currentRole?.Tags))
                     channel.Writer.TryWrite(token);
             }
             catch (Exception ex) { streamError = ex; }

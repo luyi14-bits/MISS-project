@@ -23,6 +23,7 @@ class BridgeProfile(BaseModel):
     aggression: int = Field(default=0, ge=-100, le=100)
     social_energy: int = Field(default=0, ge=-100, le=100)
     adventurousness: int = Field(default=0, ge=-100, le=100)
+    allowed_domains: list[str] = Field(default_factory=list)
 
 
 # ── globals ──

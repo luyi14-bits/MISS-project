@@ -80,24 +80,24 @@ public static class PythonBridge
     public static void MarkInitialized() => _initialized = true;
     public static void MarkDisposed() { _initialized = false; _bridge = null; }
 
-    public static ChatResponse Chat(string sessionId, string message, MISSProfile profile, string background = "")
+    public static ChatResponse Chat(string sessionId, string message, MISSProfile profile, string background = "", List<string>? tags = null)
     {
         return RunOnPythonThread(() =>
         {
-            var profileDict = ProfileToDict(profile);
+            var profileDict = ProfileToDict(profile, tags);
             dynamic result = _bridge.chat(sessionId, message, profileDict, background ?? "");
             return DictToChatResponse(result);
         });
     }
 
-    public static IEnumerable<string> ChatStream(string sessionId, string message, MISSProfile profile, string background = "")
+    public static IEnumerable<string> ChatStream(string sessionId, string message, MISSProfile profile, string background = "", List<string>? tags = null)
     {
         var tokens = new BlockingCollection<string>();
         _workQueue.Add(() =>
         {
             try
             {
-                var profileDict = ProfileToDict(profile);
+                var profileDict = ProfileToDict(profile, tags);
                 dynamic gen = _bridge.chat_stream(sessionId, message, profileDict, background ?? "");
                 foreach (var token in gen)
                 {
@@ -236,7 +236,7 @@ public static class PythonBridge
         });
     }
 
-    private static PyDict ProfileToDict(MISSProfile p)
+    private static PyDict ProfileToDict(MISSProfile p, List<string>? tags = null)
     {
         var d = new PyDict();
         d["rational_emotional"] = new PyInt(p.RationalEmotional);
@@ -249,6 +249,13 @@ public static class PythonBridge
         d["aggression"] = new PyInt(p.Aggression);
         d["social_energy"] = new PyInt(p.SocialEnergy);
         d["adventurousness"] = new PyInt(p.Adventurousness);
+        if (tags != null && tags.Count > 0)
+        {
+            var pyList = new PyList();
+            foreach (var t in tags)
+                pyList.Append(t.ToPython());
+            d["allowed_domains"] = pyList;
+        }
         return d;
     }
 
