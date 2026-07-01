@@ -256,8 +256,8 @@ footer {
   <h1>MISS 产品管线看板</h1>
   <p class="subtitle">Malleable Intelligent Synthetic Soul — AI 角色对话框架 · Beta v0.7</p>
   <div class="meta-row">
-    <span>更新：2026-07-01</span>
-    <span>版本：Beta v0.7</span>
+    <span>更新：2026-07-01 10:00</span>
+    <span>版本：Beta v0.8</span>
     <span>安全等级：A+</span>
     <span>pytest：190/190</span>
     <span>dotnet：0 error</span>
@@ -270,13 +270,13 @@ footer {
 <div class="stats-row">
   <div class="stat-card total">
     <div class="label">管线任务总数</div>
-    <div class="value">25</div>
-    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">8 Specs · 173+ Subtasks</div>
+    <div class="value">26</div>
+    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">9 Specs · 173+ Subtasks</div>
   </div>
   <div class="stat-card done">
     <div class="label">已完成 / 已验收</div>
-    <div class="value">25</div>
-    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">Phase 0-4,7 + Spec专项 + 审计 + 角色隔离 + Git加固</div>
+    <div class="value">26</div>
+    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">Phase 0-4,7 + Spec专项 + 审计 + 角色隔离 + Git加固 + License</div>
   </div>
   <div class="stat-card progress">
     <div class="label">开发中</div>
@@ -308,6 +308,7 @@ footer {
   <a href="file:///d://Desktop/MISS/docs/验收测试技术文档.md" style="color:var(--ink);font-size:0.82rem;text-decoration:none;border-bottom:1px dashed var(--rule)">验收测试技术文档</a>
   <a href="file:///d://Desktop/MISS/.trae/specs/fix-role-message-isolation/spec.md" style="color:var(--ink);font-size:0.82rem;text-decoration:none;border-bottom:1px dashed var(--rule)">角色隔离Spec</a>
   <a href="file:///d://Desktop/MISS/.trae/specs/fix-license-headers/spec.md" style="color:var(--ink);font-size:0.82rem;text-decoration:none;border-bottom:1px dashed var(--rule)">LicenseHeadersSpec</a>
+  <a href="file:///d://Desktop/MISS/.trae/specs/fix-residual-risks/spec.md" style="color:var(--ink);font-size:0.82rem;text-decoration:none;border-bottom:1px dashed var(--rule)">残余风险修复</a>
   <a href="file:///d://Desktop/MISS/miss-pipeline/git-security-audit.md" style="color:var(--ink);font-size:0.82rem;text-decoration:none;border-bottom:1px dashed var(--rule)">Git安全审计</a>
   <a href="file:///d://Desktop/MISS/.trae/specs/PIPELINE_KANBAN.md" style="color:var(--ink);font-size:0.82rem;text-decoration:none;border-bottom:1px dashed var(--rule)">程序组管线看板</a>
   <span style="color:var(--muted);font-size:0.72rem;margin-left:auto">Ctrl+Click 打开</span>
@@ -337,15 +338,20 @@ footer {
 
   <!-- 规划中 -->
   <div class="column planning">
-    <div class="column-header">📝 规划中（1）</div>
+    <div class="column-header">📝 规划中（2）</div>
     <div class="column-body">
       <div class="card">
+        <span class="tag tag-new">NEW</span>
+        <div class="card-title">fix-residual-risks</div>
+        <div class="card-meta">4 Tasks · 加密对齐 · SSRF防护</div>
+      </div>
+      <div class="card">
+        <span class="tag tag-new">NEW</span>
         <div class="card-title">Phase 5+6 — 角色Factory + TTS 语音</div>
         <div class="card-meta">待出 Spec</div>
       </div>
     </div>
   </div>
-
   <!-- 开发中 -->
   <div class="column building">
     <div class="column-header">🔨 开发中（1）</div>
@@ -611,6 +617,13 @@ footer {
   <td style="font-family:monospace">noreply email · .gitignore 全覆盖</td>
   <td>07-01</td>
 </tr>
+<tr>
+  <td style="font-weight:700">Spec 专项</td>
+  <td>fix-license-headers（全项目 SPDX 版权头补全）</td>
+  <td><span class="badge badge-pass">PASS</span></td>
+  <td style="font-family:monospace">78 source files · 0 error · 190/190</td>
+  <td>07-01</td>
+</tr>
 
 </tbody>
 </table>
@@ -678,19 +691,7 @@ footer {
 <!-- Coming Next -->
 <h2 class="section-title">🔮 下一步计划</h2>
 
-<table class="phase-table">
-<thead><tr><th>Spec</th><th>状态</th><th>Tasks</th><th>Checklist</th><th>优先级</th><th>关键修复点</th></tr></thead>
-<tbody>
-<tr>
-  <td style="font-weight:700">fix-license-headers</td>
-  <td><span class="badge badge-pending">规划中</span></td>
-  <td style="font-family:monospace">0/3</td>
-  <td style="font-family:monospace">0/4</td>
-  <td style="color:var(--warn)">🟡 规范</td>
-  <td>全项目源文件头部 AGPL v3 规范化</td>
-</tr>
-</tbody>
-</table>
+<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1.5rem">所有 Spec 任务已全部完成。下一步为 Phase 5/6 能力规划。</p>
 
 <!-- Footer -->
 <div style="margin-top:2rem;padding:1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:10px">
@@ -721,7 +722,7 @@ footer {
 </div>
 
 <footer>
-  <p>MISS 产品管线看板 · 更新于 2026-07-01 · 25/25 已发布 · 安全等级 A+ · 问题修复 61/62</p>
+  <p>MISS 产品管线看板 · 更新于 2026-07-01 · 26/26 已发布 · 安全等级 A+ · 问题修复 62/62</p>
 </footer>
 
 </div>

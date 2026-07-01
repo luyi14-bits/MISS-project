@@ -146,6 +146,7 @@
 
 | 日期 | 版本 | 变更 |
 |------|------|------|
+| 2026-07-01 | Beta v0.8 | 残余风险修复（记忆加密 · Fernet 持久化 · SSRF 防护 · 版权头规范） |
 | 2026-06-28 | Beta v0.7 | 上线前去匿名化（.pdb/.db/.env/.toc 清理 + 构建产物加固 + .gitignore 完善 + 打包脚本 Stage 4 验证） |
 | 2026-06-28 | Beta v0.6 | 三级 API fallback + 全量日志 + 崩溃防御 + 图片嵌入 DLL |
 | 2026-06-27 | Beta v0.5 | MVVM 重构 + LiteDB + instructor + 10 硬编码 Slider + 会话删除 + ⑨主题联动 |
@@ -156,7 +157,7 @@
 
 ## 阻塞项
 
-**无阻塞项。** 当前版本（Beta v0.7）可直接发布：
+**无阻塞项。** 当前版本（Beta v0.8）开发中：
 
 ```
 dotnet build: 0 error
@@ -164,6 +165,6 @@ pytest:       190 passed
 安全审计:     A (38/38)
 去匿名化:     11/11 PASS
 完整度审计:   18/18 PASS
-```
-
-`fix-role-message-isolation` 为非阻塞优化，可延后到 0.8 版本。
+`fix-residual-risks` 为本迭代核心安全加固，完成后可达等级 A。
+`fix-license-headers` 为 License 合规，非功能阻塞。
+`Phase 5+6` 为非阻塞优化，可延后到 0.9 版本。
