@@ -270,18 +270,18 @@ footer {
 <div class="stats-row">
   <div class="stat-card total">
     <div class="label">管线任务总数</div>
-    <div class="value">26</div>
-    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">9 Specs · 173+ Subtasks</div>
+    <div class="value">27</div>
+    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">10 Specs · 190+ Subtasks</div>
   </div>
   <div class="stat-card done">
     <div class="label">已完成 / 已验收</div>
-    <div class="value">26</div>
-    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">Phase 0-4,7 + Spec专项 + 审计 + 角色隔离 + Git加固 + License</div>
+    <div class="value">27</div>
+    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">Phase 0-4,7 + Spec专项 + 审计 + 角色隔离 + Git加固 + License + 残存风险</div>
   </div>
   <div class="stat-card progress">
     <div class="label">开发中</div>
-    <div class="value">1</div>
-    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">License Headers</div>
+    <div class="value">0</div>
+    <div class style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem">全部完成</div>
   </div>
   <div class="stat-card qa">
     <div class="label">待验收</div>
@@ -376,17 +376,22 @@ footer {
 
   <!-- 已发布 -->
   <div class="column done">
-    <div class="column-header">🚀 已发布（25）</div>
+    <div class="column-header">🚀 已发布（27）</div>
     <div class="column-body">
+      <div class="card">
+        <span class="tag tag-pass">DONE</span>
+        <div class="card-title">fix-residual-risks — 残存风险全清</div>
+        <div class="card-meta">记忆加密·Fernet持久化·SSRF防护·辅助修复</div>
+      </div>
+      <div class="card">
+        <span class="tag tag-pass">DONE</span>
+        <div class="card-title">fix-license-headers — SPDX 版权头补全</div>
+        <div class="card-meta">78 source files · 3-line header · py_compile+pytest+dotnet ✅</div>
+      </div>
       <div class="card">
         <span class="tag tag-pass">DONE</span>
         <div class="card-title">Git 安全加固 — G1-G3</div>
         <div class="card-meta">author noreply · .gitignore pdb/docx/wpftmp · force push</div>
-      </div>
-      <div class="card">
-        <span class="tag tag-pass">DONE</span>
-        <div class="card-title">fix-role-message-isolation — 角色隔离</div>
-        <div class="card-meta">8/8 diff · Filter+pySessionId · FULL PASS</div>
       </div>
       <div class="card">
         <span class="tag tag-pass">DONE</span>
@@ -624,6 +629,13 @@ footer {
   <td style="font-family:monospace">78 source files · 0 error · 190/190</td>
   <td>07-01</td>
 </tr>
+<tr>
+  <td style="font-weight:700">Spec 专项</td>
+  <td>fix-residual-risks（加密对齐 + SSRF + Fernet 持久化）</td>
+  <td><span class="badge badge-pass">PASS</span></td>
+  <td style="font-family:monospace">11 files · 190/190 · dotnet 0</td>
+  <td>07-01</td>
+</tr>
 
 </tbody>
 </table>
@@ -700,6 +712,7 @@ footer {
       <div style="font-weight:700;color:var(--accent2);font-size:0.9rem;margin-bottom:0.5rem">✅ 已交付</div>
       <div style="font-size:0.82rem;color:var(--muted);line-height:1.8">
         · Phase 0-4 + 7 核心引擎（16/16 Tasks）<br>
+        · fix-residual-risks（加密对齐 + SSRF + Fernet 持久化 11/11）<br>
         · fix-license-headers（SPDX 版权头补全 78/78）<br>
         · fix-role-save-and-ui（14/14 checklist）<br>
         · Python 版权头 52/52 · C# 版权头 26/26 · .gitignore 修正<br>
@@ -723,7 +736,7 @@ footer {
 </div>
 
 <footer>
-  <p>MISS 产品管线看板 · 更新于 2026-07-01 · 26/26 已发布 · 安全等级 A+ · 问题修复 62/62</p>
+  <p>MISS 产品管线看板 · 更新于 2026-07-01 · 27/27 已发布 · 安全等级 A+ · 问题修复 62/62</p>
 </footer>
 
 </div>
