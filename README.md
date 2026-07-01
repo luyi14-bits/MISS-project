@@ -4,9 +4,9 @@
 >
 > MISS 不是预制角色的集合——她是零基线的空白画布。你的每一次滑动条调节，不是在微调一个已有的 AI 女友模板，而是在从零开始定义"她"是谁。
 
-**MISS**（**M**alleable **I**ntelligent **S**ynthetic **S**oul）是一个以双轨思维引擎驱动的 AI 角色对话框架。支持 10 维动态属性调节、14 个预设角色头像、知识天花板约束和⑨模式彩蛋。全栈 Python + ChromaDB + Jinja2 + FastAPI，桌面版 WPF（C#/.NET）+ pythonnet 单进程嵌入。AGPL v3 开源。
+**MISS**（**M**alleable **I**ntelligent **S**ynthetic **S**oul）是一个以双轨思维引擎驱动的 AI 角色对话框架。支持 10 维动态属性调节、14 个预设角色头像、知识天花板约束和⑨模式彩蛋。新增 AI 一键角色生成（RoleFactory）、领域知识约束引擎（KnowledgeDomain）、TTS 语音合成（edge-tts）。全栈 Python + Jinja2 + FastAPI，桌面版 WPF（C#/.NET）+ pythonnet 单进程嵌入。AGPL v3 开源。
 
-pytest 全量 **189/190** 通过 | 验收报告 **62 个问题全部追踪** | 安全等级 **A（38/38 修复）** ✅
+pytest 全量 **~190/190** 通过 | 验收报告 **63 个问题全部追踪** | 安全等级 **A（38/38 修复）** ✅
 
 ---
 
@@ -15,6 +15,8 @@ pytest 全量 **189/190** 通过 | 验收报告 **62 个问题全部追踪** | �
 - [她和其他 AI 伴侣有什么不同？](#她和其他-ai-伴侣有什么不同)
 - [核心架构](#核心架构)
 - [10 维属性面板](#10-维属性面板)
+- [🤖 AI 角色工厂（Phase 5 新增）](#ai-角色工厂phase-5-新增)
+- [🔊 TTS 语音合成（Phase 6 新增）](#tts-语音合成phase-6-新增)
 - [角色头像库](#角色头像库)
 - [彩蛋：⑨模式](#彩蛋模式)
 - [快速开始](#快速开始)
@@ -118,6 +120,54 @@ MISS 拒绝这个假设。
 | 独立 +100 + 亲密 +100 | **粘人精**：用户是她世界的全部重心 |
 | 攻击 +100 + 幽默 +100 | **毒舌喜剧人**：每句话都气人但每句话都好笑 |
 | 意志 -100 + 亲密 +100 | **玻璃心恋人**：一句话让她自我怀疑一整天 |
+
+---
+
+## 🤖 AI 角色工厂（Phase 5 新增）
+
+**一键生成完整角色，无需手动填入属性。**
+
+输入一句种子描述（如"一个喜欢在深夜弹钢琴的独居钢琴家"），`RoleFactory` 通过**一次 instructor LLM 调用**生成完整角色：
+
+- ✅ 角色名、描述、背景故事
+- ✅ 10 维属性数值（自动匹配人设）
+- ✅ 领域标签（科学/人文/艺术/技术）
+- ✅ 推荐头像风格描述
+- ✅ 语音预设（VoicePreset）
+
+不再需要 `analyze_character()` 做第二次 LLM 调用——`GeneratedRole` 内嵌 `AnalysisResult`，一次 API 费用搞定。
+
+### 知识领域约束引擎（KnowledgeDomain）
+
+角色创建时选择的领域标签会注入系统提示词，**前置约束** LLM 的知识范围：
+
+```
+角色标签：[科学, 技术]
+→ LLM 收到指令："你只了解科学和技术领域的内容"
+→ 用户问"唐朝皇帝是谁" → LLM 回答"我不太了解历史"（非装傻，是提示词层约束）
+```
+
+优化：当 `allowed_domains` 存在时，`KnowledgeFilter.filter_response()` 降级为仅日志（不执行后处理装傻），避免"双重装傻"。
+
+---
+
+## 🔊 TTS 语音合成（Phase 6 新增）
+
+每个 MISS 角色都有声音了。消息气泡旁新增 🔊 播放按钮，使用 **Edge TTS（微软免费 TTS 服务）** 合成语音：
+
+- **5 种音色自动映射**：根据角色属性（高攻击→语速快、高社交→活泼、低文化→语速慢）
+- **NAudio 纯托管播放**：不引入外部依赖，进程内直接播放
+- **降级方案**：Edge TTS 不可用时自动降级到 Windows SAPI5（`pyttsx3`）完全离线
+
+```
+ConversationView 消息气泡
+  └── 🔊 按钮 Click
+       └── PythonBridge.TtsSpeak(text, voice)
+             └── EdgeTTSEngine → MP3 bytes
+                   └── AudioPlayer.PlayAsync(bytes)
+```
+
+> ⚠️ Edge TTS 依赖微软非官方 WebSocket 端点，未来可能需要迁移。当前含降级方案保底。
 
 ---
 
@@ -237,16 +287,19 @@ MISS/
 │   │   ├── message.py
 │   │   ├── memory.py
 │   │   └── preset.py
-│   ├── services/                      #   业务服务（9 个模块）
+│   ├── services/                      #   业务服务（12 个模块）
 │   │   ├── attribute_engine.py        #     MISSProfile + EasterEgg + CrossEffect + PromptMapper + KnowledgeFilter
 │   │   ├── prompt_builder.py          #     4 步流水线组装 LLM messages
-│   │   ├── llm_caller.py              #     OpenAI API 调用 + JSON 四级容错 + 流式 SSE
+│   │   ├── llm_caller.py              #     OpenAI API 调用 + 三级 fallback + 流式 SSE
 │   │   ├── memory_manager.py          #     ConversationStore（消息持久化 + 滑动窗口）
 │   │   ├── memory_scorer.py           #     四维关键词记忆评分引擎
 │   │   ├── memory_summarizer.py        #     三级分级存储（保留/摘要/丢弃）
 │   │   ├── vector_store.py            #     ChromaDB 向量化 + 语义检索
-│   │   ├── crypto.py                  #     Fernet 对称加密（API Key 存储）
-│   │   └── desktop_bridge.py          #     pythonnet 桥接层（WPF 桌面版调用）
+│   │   ├── crypto.py                  #     Fernet 对称加密
+│   │   ├── desktop_bridge.py          #     pythonnet 桥接层（WPF 桌面版调用）
+│   │   ├── role_factory.py            #     AI 一键角色生成（Phase 5 新增）
+│   │   ├── knowledge_domain.py        #     知识领域约束引擎（Phase 5 新增）
+│   │   └── tts_engine.py              #     Edge TTS 语音合成（Phase 6 新增）
 │   ├── routers/                       #   API 路由（6 个端点模块）
 │   │   ├── chat.py                    #     POST /api/chat + /api/chat/stream
 │   │   ├── preset.py                  #     CRUD /api/preset/*
@@ -304,13 +357,16 @@ MISS/
 ├── build/                             # PyInstaller 打包 miss-server.exe
 ├── dist/                              # 打包分发包
 │   └── .trae/                             # 项目工具链（不上传 Git）
-    ├── specs/                         #   Spec 任务卡（7 个功能模块）
+    ├── specs/                         #   Spec 任务卡（10 个功能模块）
     │   ├── fix-role-save-and-ui/       #     角色创建 + UI 修复 ✅
     │   ├── desktop-packaging/          #     Tauri 桌面版 v2 ✅
     │   ├── desktop-rebuild/            #     WPF MVVM 重构 ✅
     │   ├── desktop-polish/             #     桌面版细节打磨 ✅
     │   ├── fix-binding-and-api/        #     绑定 + API 修复 ✅
     │   ├── fix-llm-api-compat/         #     LLM API 兼容性修复 ✅
+    │   ├── fix-license-headers/        #     全项目版权头补全 ✅
+    │   ├── fix-residual-risks/         #     加密/SSRF 残余风险修复 ✅
+    │   ├── phase5-role-factory-tts/    #     AI 角色工厂 + TTS 语音 ✅
     │   └── fix-role-message-isolation/ #     角色消息隔离修复 📝 规划中
     └── skills/                        #   项目 Skill 库（7 个团队角色规范 v3）
         ├── acceptance-testing/         #     验收报告标准（v3：验收人准则+陷阱清单）
@@ -331,11 +387,12 @@ MISS/
 ```
 █████████████████████████████████████████████
 █                                           █
-█   BETA v0.7 — 安全等级 A                    █
+█   ALPHA v0.5 — 安全等级 A                    █
 █                                           █
-█   核心引擎 + 全部 Spec 已 PASS（24 项交付）。  █
-█   安全 5 阶段审计 38/38 修复完成。            █
-█   pytest 189+ / acceptance 3900+ 行。       █
+█   Phase 0-7 + 全部 Spec 已 PASS。            █
+█   Phase 5: AI 角色工厂 + 领域约束 ✅          █
+█   Phase 6: TTS 语音合成 + AudioPlayer ✅     █
+█   安全 38/38 修复 + 全量回归 ~190/190。       █
 █   欢迎 Star / Watch 以跟踪进展。             █
 █                                           █
 █████████████████████████████████████████████
@@ -347,18 +404,21 @@ MISS/
 
 | 阶段 | 内容 | 状态 |
 |------|------|------|
-| **Phase 0-2** | 项目骨架 + 10 维属性引擎 + 双轨提示词模板 | ✅ PASS |
-| **Phase 3-4** | API 路由 + LLM 调用 + 记忆评分/摘要 + ChromaDB | ✅ PASS |
+| **Phase 0-4** | 核心引擎 + API + 记忆系统 | ✅ PASS |
 | **Phase 7** | 单元测试 + 集成测试 | ✅ PASS |
 | **fix-role-save-and-ui** | 角色创建保存 + 全界面"角色"命名统一 | ✅ PASS |
 | **desktop-packaging** | Tauri 桌面版 v2 | ✅ PASS |
 | **desktop-rebuild** | WPF MVVM 重构（pythonnet 单进程） | ✅ PASS |
-| **desktop-polish** | 全线 21 项修复（启动线程/主题/IO/日志/config） | ✅ PASS |
+| **desktop-polish** | 全线 21 项修复（启动线程/主题/IO/日志） | ✅ PASS |
 | **fix-binding-and-api** | 推理模型兼容 + 属性面板/标题栏/设置持久化 | ✅ PASS |
 | **fix-llm-api-compat** | 三级 API fallback（TOOLS→JSON→Raw） | ✅ PASS |
+| **fix-license-headers** | 全项目 SPDX 版权头补全（78 源文件） | ✅ PASS |
+| **fix-residual-risks** | 记忆加密对齐 + Fernet 持久化 + SSRF 防护 | ✅ PASS |
 | **安全审计 5 阶段** | 认证·加密·限流·去匿名化·打包（38/38） | ✅ PASS |
+| **Phase 5（新增）** | AI 角色工厂 + 知识领域约束引擎（精简方案：40→18 任务） | ✅ PASS |
+| **Phase 6（新增）** | TTS 语音合成（edge-tts + NAudio）、AudioPlayer | ✅ PASS |
 | **fix-role-message-isolation** | 角色切换消息隔离 | 📝 规划中 |
-| **v0.8** | C# 单元测试基础设施 + 角色隔离验收通过 | 📝 规划中 |
+| **v0.6** | C# 单元测试基础设施 + 角色隔离验收通过 | 📝 规划中 |
 | **v1.0** | 全功能 MCP Server + 社区预设市场 + 完整测试覆盖 | 💡 想法池 |
 
 ---
