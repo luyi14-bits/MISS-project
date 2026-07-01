@@ -1,4 +1,7 @@
-﻿"""
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+"""
 新功能专项验收测试 - runtime settings + IntimacyEngine + KnowledgeFilter + 10交叉效果
 """
 import json, os, sys

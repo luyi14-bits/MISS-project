@@ -1,3 +1,6 @@
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 """
 MISS Desktop Bridge — synchronous Python entry points for C# pythonnet.
 All async LLM calls are wrapped with asyncio.new_event_loop() + run_until_complete().

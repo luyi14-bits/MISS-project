@@ -1,3 +1,6 @@
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 """
 Task 2.1 严格验收测试 - MISS小姐 Jinja2 系统提示词模板
 验收标准：传入 profile 输出完整提示词，education_level=-100 时自动含⑨和BAKA

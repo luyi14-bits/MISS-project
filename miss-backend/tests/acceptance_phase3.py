@@ -1,4 +1,7 @@
-﻿"""
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+"""
 Phase 3 全面验收测试 - Task 3.2 (预设CRUD) + Task 3.3 (导入导出)
 """
 import io, os, sys, json

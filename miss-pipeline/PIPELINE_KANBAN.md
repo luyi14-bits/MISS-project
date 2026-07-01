@@ -1,6 +1,6 @@
 # MISS 项目管线看板
 
-> 更新时间：2026-06-28 · 当前发布版本：Beta v0.7
+> 更新时间：2026-07-01 · 当前发布版本：Beta v0.8
 
 ---
 
@@ -8,14 +8,32 @@
 
 | 状态 | Spec 数 | 说明 |
 |------|---------|------|
-| ✅ **已完成** | 5 | 已发布/验收通过 |
-| 🔄 **进行中** | 1 | 部分完成，核心功能已上线 |
-| ⏳ **待开工** | 1 | 未启动 |
+| ✅ **已完成** | 8 | 已发布/验收通过 |
+| 🔄 **进行中** | 1 | License 头部规范化 |
+| 📝 **规划中** | 2 | Phase 5/6 + 加密体系对齐 + SSRF 防护 |
 | ❌ **废弃** | 1 | 技术方案变更（Tauri → pythonnet） |
 
 ---
 
 ## ✅ 已完成
+
+### fix-role-message-isolation — 角色切换消息隔离
+
+| Task | 内容 | 状态 |
+|------|------|------|
+| Task 1 | 角色切换时消息隔离（save→clear→load filtered） | ✅ |
+| Task 2 | session_id 加角色名 | ✅ |
+
+**产物**：8/8 diff · Filter+pySessionId · 角色隔离+FULL PASS
+
+### Git 安全审计 G1-G3
+
+| Task | 内容 | 状态 |
+|------|------|------|
+| G1 | commit author 邮箱改为 noreply | ✅ |
+| G2 | _wpftmp.csproj 移除 + .gitignore | ✅ |
+| G3 | .docx/.doc 元数据移除 | ✅ |
+| 发布 | 所有阶段 5 修改推送至远程 | ✅ |
 
 ### desktop-rebuild — MVVM + pythonnet + LiteDB + instructor
 
@@ -82,34 +100,37 @@
 
 ## 🔄 进行中
 
-### fix-llm-api-compat — API 兼容性 + 三级 fallback
+### fix-license-headers — 全项目 SPDX 版权头补全
 
 | Task | 内容 | 状态 |
 |------|------|------|
-| Task 1 | `call()` 三级 fallback（TOOLS → JSON → 裸API） | ✅ 已实现 |
-| Task 1.1-1.3 | 三级拆方法（简化为 try/except 链） | ✅ 已实现 |
-| Task 1.4 | `_call_level3()` json.loads 失败 → 安全占位符（非原文） | ✅ 已实现 |
-| Task 1.5 | 每次调用完成写入 INFO 日志 | ✅ 已实现 |
-| Task 1.6 | `analyze_character()` 三级 fallback + 日志 | ✅ 已实现 |
-| Task 1 extra | 5 处静默异常加 logging.warning | ✅ 已实现 |
-| Task 2 | `_is_reasoning_model()` 检测 | ✅ 已实现 |
-| Task 3 | `POST /api/settings/test` 端点增强 | ⏳ 待开工 |
-| Task 4 | pytest 回归验证 | ⏳ 待开工 |
+| Task 1 | Python 54 文件 SPDX 头注入 | ✅ 脚本就绪 |
+| Task 2 | C# 26 文件 SPDX 头注入 | ✅ 脚本就绪 |
+| Task 3 | .gitignore `*.spec` 修正 | ✅ 已修复 |
+| 回归 | pytest 190/190 · dotnet 0 error | ⏳ |
 
-**说明**：核心功能（三级 fallback + 推理模型检测 + 全量日志）已实装上线。Task 3（测试端点增强）属于可观测性优化，非阻塞发布。
+**安全效果**：80 个源文件 100% 覆盖 SPDX-License-Identifier: AGPL-3.0-or-later，法律可执行
 
 ---
 
-## ⏳ 待开工
+## ⏳ 规划中
 
-### fix-role-message-isolation — 角色切换消息隔离
+### fix-residual-risks — 加密体系对齐 + SSRF 防护
 
 | Task | 内容 | 状态 |
 |------|------|------|
-| Task 1 | 角色切换时消息隔离（save→clear→load filtered） | ⏳ |
-| Task 2 | session_id 加角色名 | ⏳ |
+| Task 1 | 记忆摘要加密对齐（memory_entries 明文→密文） | ⏳ |
+| Task 2 | Fernet 密钥持久化（`fernet.key` 文件 + crypto.py 惰性初始化） | ⏳ |
+| Task 3 | SSRF 防护（base_url 校验禁止内网/localhost） | ⏳ |
+| Task 4 | 辅助修复（日志参数化 + requirements.txt + C# 转义） | ⏳ |
 
-**预期工作量**：~20 行 C#（MainViewModel.cs），0 行 Python
+**安全效果**：修复 4 项中危（R01 SSRF · R02 记忆加密 · R05 密钥持久化 · R09 依赖声明），安全等级 A- → A
+
+### Phase 5+6 — 角色 Factory + TTS 语音
+
+| Task | 内容 | 状态 |
+|------|------|------|
+| 待出 Spec | 知识域约束引擎 · 语音合成 | ⏳ |
 
 ---
 

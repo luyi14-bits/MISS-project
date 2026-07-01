@@ -1,3 +1,6 @@
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 """
 Task 1.2 严格验收测试 - 彩蛋系统：⑨模式触发器
 验收标准：education_level=-100 返回 cirno_mode，调至 -99 后返回空 dict

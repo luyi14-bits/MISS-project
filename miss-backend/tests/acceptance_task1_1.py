@@ -1,3 +1,6 @@
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 """
 Task 1.1 严格验收测试 - MISS属性数据模型
 验收标准：正负边界值能通过验证，超界抛 ValidationError

@@ -1,4 +1,7 @@
-﻿"""
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+"""
 Phase 7 验收测试 - Task 7.1 (单元测试) + Task 7.2 (集成测试)
 验收标准:
   7.1: pytest 全绿

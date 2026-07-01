@@ -43,7 +43,8 @@ bin/
 *.pyz
 *_absolute.txt
 xref*.html
-*.spec
+# PyInstaller spec excluded; .trae/specs/*/spec.md are NOT excluded
+*.PyInstaller.spec
 !requirements*.txt
 
 # ========================================

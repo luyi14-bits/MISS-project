@@ -1,4 +1,7 @@
-﻿"""
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+"""
 Task 4.2 严格验收测试 - 记忆重要性评分 + 摘要生成 (v2: 关键词引擎版)
 验收标准: 长时间对话后自动触发评分与压缩
 """

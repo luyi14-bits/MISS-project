@@ -1,4 +1,7 @@
-﻿"""
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+"""
 程序组最新任务验收 - character/analyze + background 扩展
 """
 import json, os, sys

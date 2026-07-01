@@ -1,3 +1,6 @@
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 # Windows 启动方式: python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
 # 若 uvicorn 命令找不到，请使用 python -m uvicorn 而非直接 uvicorn
 

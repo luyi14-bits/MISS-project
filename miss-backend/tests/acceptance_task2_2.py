@@ -1,4 +1,7 @@
-﻿"""
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+"""
 Task 2.2 严格验收测试 - 提示词组装器（Prompt Builder）
 验收标准：调用后返回格式正确的 messages 列表
 """

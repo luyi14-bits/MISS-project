@@ -1,4 +1,7 @@
-﻿"""
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+"""
 Task 4.3 严格验收测试 - 向量嵌入 + ChromaDB 存储 (Mock版)
 验收标准: 存储后可按语义检索，相关性合理
 """

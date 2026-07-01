@@ -1,3 +1,6 @@
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 PERSONAL_KEYWORDS = [
     "我叫", "我是", "我喜欢", "我讨厌", "我决定",
     "我的", "年龄", "生日", "家在", "工作", "电话", "地址",

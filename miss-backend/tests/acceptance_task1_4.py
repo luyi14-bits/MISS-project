@@ -1,3 +1,6 @@
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 """
 Task 1.4 严格验收测试 - 属性→提示词片段映射器
 验收标准：不同等级输出正确对应，含彩蛋条件分支

@@ -1,3 +1,6 @@
+﻿# Copyright (C) 2026  MISS Project Contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 """
 Task 1.3 严格验收测试 - 属性交叉影响计算器
 验收标准：给定 profile 返回正确的交叉人格 + 对应的提示词追加文本
