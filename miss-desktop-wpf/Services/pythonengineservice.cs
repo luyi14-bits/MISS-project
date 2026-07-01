@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2026  MISS Project Contributors
+// Copyright (C) 2026  MISS Project Contributors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 using System;
@@ -47,6 +47,22 @@ public class PythonEngineService : IDisposable
         Environment.SetEnvironmentVariable("PYTHONPATH",
             Path.Combine(pythonHome, "Lib") + ";" +
             Path.Combine(pythonHome, "Lib", "site-packages"));
+
+        var fernetKeyPath = Path.Combine(dataDir, "fernet.key");
+        if (File.Exists(fernetKeyPath))
+        {
+            var key = File.ReadAllText(fernetKeyPath).Trim();
+            Environment.SetEnvironmentVariable("MISS_FERNET_KEY", key);
+            LoggingService.Info($"Ferret key loaded from {fernetKeyPath}");
+        }
+        else
+        {
+            var key = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+            Directory.CreateDirectory(Path.GetDirectoryName(fernetKeyPath)!);
+            File.WriteAllText(fernetKeyPath, key);
+            Environment.SetEnvironmentVariable("MISS_FERNET_KEY", key);
+            LoggingService.Info($"Ferret key generated and saved to {fernetKeyPath}");
+        }
 
         Runtime.PythonDLL = dllPath;
         PythonEngine.PythonHome = pythonHome;

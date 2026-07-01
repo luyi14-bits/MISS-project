@@ -1,6 +1,8 @@
-﻿# Copyright (C) 2026  MISS Project Contributors
+# Copyright (C) 2026  MISS Project Contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+import logging
+from urllib.parse import urlparse
 from threading import Lock
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -26,6 +28,31 @@ config = Settings()
 _runtime_lock = Lock()
 _runtime_overrides: dict = {}
 
+_PRIVATE_NET_PREFIXES = (
+    "10.", "192.168.", "172.16.", "172.17.", "172.18.", "172.19.",
+    "172.20.", "172.21.", "172.22.", "172.23.", "172.24.",
+    "172.25.", "172.26.", "172.27.", "172.28.", "172.29.",
+    "172.30.", "172.31.",
+)
+
+_BLOCKED_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
+
+
+def _validate_base_url(url: str) -> str:
+    if not url:
+        return url
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError(f"base_url scheme must be http or https: {parsed.scheme}")
+    host = parsed.hostname or ""
+    if host in _BLOCKED_HOSTS:
+        logging.warning("[SSRF] base_url 指向本地地址 (%s)，已清除", host)
+        return ""
+    if any(host.startswith(p) for p in _PRIVATE_NET_PREFIXES):
+        logging.warning("[SSRF] base_url 指向内网地址 (%s)，已清除", host)
+        return ""
+    return url
+
 
 def get_api_key():
     with _runtime_lock:
@@ -45,10 +72,14 @@ def get_model():
 def apply_runtime_settings(settings: dict):
     global _runtime_overrides
     with _runtime_lock:
-        _runtime_overrides = {
-            k: v for k, v in settings.items()
-            if v is not None and v != ""
-        }
+        filtered = {}
+        for k, v in settings.items():
+            if v is None or v == "":
+                continue
+            if k == "openai_base_url":
+                v = _validate_base_url(v)
+            filtered[k] = v
+        _runtime_overrides = filtered
 
 
 def get_runtime_settings() -> dict:

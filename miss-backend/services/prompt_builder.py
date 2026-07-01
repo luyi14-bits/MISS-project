@@ -35,7 +35,7 @@ class PromptBuilder:
             try:
                 recalled = self._vector_store.recall(query=user_message, top_k=5)
             except Exception as e:
-                import logging; logging.warning(f"[降级] vector_store.recall 失败: {e}")
+                import logging; logging.warning("[降级] vector_store.recall 失败: %s", e)
         if not recalled:
             recalled = self._conversation_store.recall(session_id, user_message)
 

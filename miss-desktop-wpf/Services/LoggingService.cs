@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2026  MISS Project Contributors
+// Copyright (C) 2026  MISS Project Contributors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 using System;
@@ -25,12 +25,12 @@ public static class LoggingService
 
     private static void Write(string level, string message)
     {
-        var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{level}] {message}";
+        var safeMessage = (message ?? "").Replace("\n", "\\n").Replace("\r", "\\r");
+        var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{level}] {safeMessage}";
         lock (_lock)
         {
             File.AppendAllText(LogPath, line + Environment.NewLine);
         }
-        // Also output to debug trace (captured by Process Monitor / VS output)
-        System.Diagnostics.Trace.WriteLine($"[MISS:{level}] {message}");
+        System.Diagnostics.Trace.WriteLine($"[MISS:{level}] {safeMessage}");
     }
 }

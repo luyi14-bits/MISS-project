@@ -1,11 +1,13 @@
-﻿# Copyright (C) 2026  MISS Project Contributors
+# Copyright (C) 2026  MISS Project Contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 import json
+import logging
 from datetime import datetime, timezone
 from config import config, get_api_key, get_base_url
 from database import SessionLocal
 from models.memory import MemoryEntry as MemoryEntryModel
+from .crypto import decrypt
 
 
 class VectorMemoryStore:
@@ -20,8 +22,7 @@ class VectorMemoryStore:
             from chromadb import PersistentClient
             self._chroma_client = PersistentClient(path=config.vector_db_path)
         except Exception as e:
-            import logging
-            logging.warning(f"[VectorMemoryStore] chromadb 不可用，向量功能已禁用: {e}")
+            logging.warning("[VectorMemoryStore] chromadb 不可用，向量功能已禁用: %s", e)
             self._disabled = True
 
     @property
@@ -59,7 +60,8 @@ class VectorMemoryStore:
         entries = []
         if results["ids"] and results["ids"][0]:
             for i, doc_id in enumerate(results["ids"][0]):
-                entry = {"id": doc_id, "content": results["documents"][0][i] if results["documents"] else ""}
+                raw = results["documents"][0][i] if results["documents"] else ""
+                entry = {"id": doc_id, "content": decrypt(raw)}
                 if results["metadatas"] and results["metadatas"][0]:
                     entry.update(results["metadatas"][0][i] or {})
                 if results["distances"]:
@@ -82,7 +84,7 @@ class VectorMemoryStore:
                 if not r.content:
                     continue
                 ids.append(r.id)
-                documents.append(r.content)
+                documents.append(decrypt(r.content) if r.content else "")
                 metadatas.append({
                     "session_id": r.session_id,
                     "importance": r.importance,
@@ -112,7 +114,7 @@ class VectorMemoryStore:
             finally:
                 db.close()
         except Exception as e:
-            logging.warning(f"[向量库] 回写embedding失败: {e}")
+            logging.warning("[向量库] 回写embedding失败: %s", e)
 
     def recall_with_threshold(self, query: str, top_k: int = 5, threshold: float = 0.5) -> list[dict]:
         if self._disabled or not self.collection:
@@ -156,7 +158,7 @@ class VectorMemoryStore:
                     try:
                         self.remove(entry.id)
                     except Exception as e:
-                        import logging; logging.warning(f"[降级] age 清理失败: {e}")
+                        logging.warning("[降级] age 清理失败: %s", e)
                     deleted += 1
                 else:
                     new_imp = max(0, entry.importance - 10)
@@ -166,7 +168,7 @@ class VectorMemoryStore:
                         try:
                             self.remove(entry.id)
                         except Exception:
-                            logging.warning(f"[向量库] remove失败: {entry.id}")
+                            logging.warning("[向量库] remove失败: %s", entry.id)
                     decayed += 1
             db.commit()
             return {"deleted": deleted, "decayed": decayed}

@@ -1,10 +1,12 @@
-﻿# Copyright (C) 2026  MISS Project Contributors
+# Copyright (C) 2026  MISS Project Contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 import uuid
 from datetime import datetime, timezone
 from database import SessionLocal
 from models.memory import MemoryEntry
+from .crypto import encrypt
+import logging
 
 
 class MemorySummarizer:
@@ -49,7 +51,7 @@ class MemorySummarizer:
             entry = MemoryEntry(
                 id=entry_id,
                 session_id=session_id,
-                content=content,
+                content=encrypt(content),
                 importance=importance,
                 category=category,
                 timestamp=datetime.now(timezone.utc),
@@ -65,7 +67,7 @@ class MemorySummarizer:
                         metadata={"session_id": session_id, "importance": importance, "category": category},
                     )
                 except Exception as e:
-                    import logging; logging.warning(f"[降级] vector_store.store 失败: {e}")
+                    logging.warning("[降级] vector_store.store 失败: %s", e)
         except Exception:
             db.rollback()
             raise

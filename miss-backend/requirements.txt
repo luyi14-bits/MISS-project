@@ -9,3 +9,4 @@ sqlalchemy>=2.0.0
 python-multipart>=0.0.6
 slowapi>=0.1.10
 cryptography>=42.0.0
+instructor>=1.0.0

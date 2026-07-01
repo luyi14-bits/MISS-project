@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026  MISS Project Contributors
+# Copyright (C) 2026  MISS Project Contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 import os
@@ -167,7 +167,7 @@ class TestMemorySummarizer:
             entry = db.query(MemoryEntry).filter(MemoryEntry.session_id == "s_test").first()
             assert entry is not None
             assert entry.importance == 90
-            assert entry.content == "Important info about user preferences"
+            assert entry.content.startswith("ENC_V1_")
         finally:
             db.close()
 
@@ -265,7 +265,7 @@ class TestMemorySummarizer:
         try:
             entry = db.query(MemoryEntry).filter(MemoryEntry.session_id == "s_write").first()
             assert entry is not None
-            assert entry.content == "test content"
+            assert entry.content.startswith("ENC_V1_")
             assert entry.importance == 75
             assert entry.category == "fact"
             assert len(entry.id) == 12

@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2026  MISS Project Contributors
+# Copyright (C) 2026  MISS Project Contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
 """
@@ -37,6 +37,9 @@ _warnings: List[str] = []
 
 def init(data_dir: str) -> Dict[str, Any]:
     """Call once from C# on startup. Sets paths, inits DB, downgrades ChromaDB if unavailable."""
+    from .crypto import init_fernet
+    init_fernet()
+
     global _bridge_store, _prompt_builder, _llm_caller, _knowledge_filter
     global _intimacy_engine, _vector_store, _warnings
     _warnings = []
