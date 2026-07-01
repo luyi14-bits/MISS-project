@@ -191,6 +191,7 @@ dotnet run
 ```
 MISS/
 ├── README.md                         # 项目总览（本文件）
+├── CLA.md                           # 贡献者许可协议
 ├── LICENSE                           # GNU AGPL v3
 ├── .gitignore                        # Git 忽略规则
 │
@@ -315,10 +316,10 @@ MISS/
         ├── acceptance-testing/         #     验收报告标准（v3：验收人准则+陷阱清单）
         ├── coding-ethics/              #     编程八荣八耻（v3：XAML/线程安全/LiteDB）
         ├── project-secretary/          #     项目秘书（文件整理、管线维护）
-        ├── security-academy/           #     全栈安全审计（STRIDE+5层防御+审计流程）
+        ├── security-academy/           #     安全专家组（v3：STRIDE+5层防御+审计流程）
         ├── spec-pipeline/              #     管线工程师（v2：优先级矩阵+置信度审计）
-        ├── test-driven-development/    #     测试专家组（Beck/Stewart/Okken）
-        └── trinity-mentors/            #     AI/ML 导师团（Raschka/Karpathy/Lyalin）
+        ├── test-driven-development/    #     测试方法论（TDD + pytest + E2E）
+        └── trinity-mentors/            #     AI/ML 导师团
 ```
 
 > **注**：Track A（内心独白）和 Track B（说出口的回应）在提示词层实现（参见 `miss_system.j2` 的 `<cognitive_engine>` 块），不是独立的 Python 模块。知识天花板约束在 `miss_system.j2` 中注入提示词层，并在 `KnowledgeFilter` 中做后端二次校验。架构细节见 [`miss-backend/docs/architecture.md`](./miss-backend/docs/architecture.md)。
