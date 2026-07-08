@@ -83,6 +83,28 @@ public partial class RoleSidebar : UserControl
         }
     }
 
+    private void ExportTavernCard_Click(object sender, RoutedEventArgs e)
+    {
+        if (VM.CurrentRole is not RoleData role) return;
+        var dialog = new SaveFileDialog
+        {
+            Filter = "SillyTavern 角色卡 (*.png)|*.png",
+            FileName = $"{role.Name}_ST.png",
+            Title = "导出为 SillyTavern 角色卡",
+        };
+        if (dialog.ShowDialog() != true) return;
+
+        try
+        {
+            TavernCardExporter.ExportToPng(role, dialog.FileName);
+            NotificationService.Info($"已导出 ST 角色卡：{role.Name}");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Error($"导出失败：{ex.Message}");
+        }
+    }
+
     private void DeleteRole_Click(object sender, RoutedEventArgs e)
     {
         if (VM.CurrentRole is not RoleData role) return;

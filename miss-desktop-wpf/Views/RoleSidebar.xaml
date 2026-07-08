@@ -91,9 +91,12 @@
                         <Button Content="+" Width="28" Height="28" ToolTip="新建角色"
                                 Style="{DynamicResource IconButtonStyle}"
                                 Click="CreateRole_Click"/>
-                        <Button Content="★" Width="28" Height="28" ToolTip="导出"
+                        <Button Content="★" Width="28" Height="28" ToolTip="导出 JSON"
                                 Style="{DynamicResource IconButtonStyle}"
                                 Click="ExportRole_Click" FontSize="14"/>
+                        <Button Content="🎴" Width="28" Height="28" ToolTip="导出 ST 角色卡"
+                                Style="{DynamicResource IconButtonStyle}"
+                                Click="ExportTavernCard_Click" FontSize="12"/>
                         <Button Content="↓" Width="28" Height="28" ToolTip="导入"
                                 Style="{DynamicResource IconButtonStyle}"
                                 Click="ImportRole_Click" FontSize="12"/>

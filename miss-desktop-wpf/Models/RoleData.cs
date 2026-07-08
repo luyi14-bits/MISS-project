@@ -33,4 +33,23 @@ public class RoleData
 
     [JsonPropertyName("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    // SillyTavern / TavernAI 角色卡兼容字段
+    [JsonPropertyName("tavern_description")]
+    public string TavernDescription { get; set; } = "";
+
+    [JsonPropertyName("tavern_personality")]
+    public string TavernPersonality { get; set; } = "";
+
+    [JsonPropertyName("tavern_scenario")]
+    public string TavernScenario { get; set; } = "";
+
+    [JsonPropertyName("tavern_first_message")]
+    public string TavernFirstMessage { get; set; } = "";
+
+    [JsonPropertyName("tavern_creator")]
+    public string TavernCreator { get; set; } = "";
+
+    [JsonPropertyName("tavern_character_version")]
+    public string TavernCharacterVersion { get; set; } = "";
 }

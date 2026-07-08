@@ -154,4 +154,27 @@ public partial class CreateRoleWindow : Window
         DialogResult = false;
         Close();
     }
+
+    private void ImportTavernCard_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Filter = "SillyTavern 角色卡 (*.png)|*.png",
+            Title = "导入 SillyTavern 角色卡",
+        };
+        if (dialog.ShowDialog() != true) return;
+
+        var card = TavernCardParser.ParseFromPng(dialog.FileName);
+        if (card == null)
+        {
+            NotificationService.Error("不是有效的 TavernAI 角色卡");
+            return;
+        }
+
+        NameInput.Text = card.Name;
+        DescInput.Text = card.Description ?? "";
+        BgInput.Text = card.Scenario ?? "";
+
+        StatusText.Text = $"已导入角色卡：{card.Name}";
+    }
 }
