@@ -84,6 +84,8 @@ vector_db/
 # ========================================
 miss-market-research/
 miss-pipeline/
+.reasonix/
+reasonix.toml
 
 # ========================================
 # OS
