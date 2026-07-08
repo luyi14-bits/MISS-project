@@ -242,8 +242,17 @@ dotnet run
 MISS/
 ├── README.md                         # 项目总览（本文件）
 ├── CLA.md                           # 贡献者许可协议
+├── CONTRIBUTING.md                  # 贡献指南
+├── CODE_OF_CONDUCT.md               # 行为准则
+├── CHANGELOG.md                     # 版本发布历史
+├── SECURITY.md                      # 安全策略披露
 ├── LICENSE                           # GNU AGPL v3
 ├── .gitignore                        # Git 忽略规则
+│
+├── .github/                            # GitHub 社区规范
+│   ├── CODEOWNERS
+│   ├── ISSUE_TEMPLATE/  (bug + feature)
+│   └── PULL_REQUEST_TEMPLATE.md
 │
 ├── avatars/                          # 角色头像库（14 个角色 + 说明文档）
 │   ├── README.md                     #   头像命名规范与角色人设
@@ -364,11 +373,12 @@ MISS/
     │   ├── fix-license-headers/        #     全项目版权头补全 ✅
     │   ├── fix-residual-risks/         #     加密/SSRF 残余风险修复 ✅
     │   ├── phase5-role-factory-tts/    #     AI 角色工厂 + TTS 语音 ✅
-    │   └── fix-role-message-isolation/ #     角色消息隔离修复 🔨 开发中
-    └── skills/                        #   项目 Skill 库（7 个团队角色规范 v3）
+    │   └── fix-role-message-isolation/ #     角色消息隔离修复 ✅（Loop #1 已交付）
+    └── skills/                        #   项目 Skill 库（8 个团队角色规范 v3）
+        ├── pm-mentor/                  #     产品经理（PRD/优先级/路线图）🆕
         ├── acceptance-testing/         #     验收报告标准（v3：验收人准则+陷阱清单）
         ├── coding-ethics/              #     编程八荣八耻（v3：XAML/线程安全/LiteDB）
-        ├── project-secretary/          #     项目秘书（文件整理、管线维护）
+        ├── project-secretary/          #     项目秘书（文件整理/管线维护/标准审计）
         ├── security-academy/           #     安全专家组（v3：STRIDE+5层防御+审计流程）
         ├── spec-pipeline/              #     管线工程师（v2：优先级矩阵+置信度审计）
         ├── test-driven-development/    #     测试方法论（TDD + pytest + E2E）
@@ -414,9 +424,8 @@ MISS/
 | **安全审计 5 阶段** | 认证·加密·限流·去匿名化·打包（38/38） | ✅ PASS |
 | **Phase 5（新增）** | AI 角色工厂 + 知识领域约束引擎（精简方案：40→18 任务） | ✅ PASS |
 | **Phase 6（新增）** | TTS 语音合成（edge-tts + NAudio）、AudioPlayer | ✅ PASS |
-| **fix-role-message-isolation** | 角色切换消息隔离 | 🔨 开发中 |
-| **sillytavern-card-compat** | SillyTavern 角色卡兼容（导入/导出 PNG） | 📝 规划中 |
-| **v0.6** | C# 单元测试基础设施 | 📝 规划中 |
+| **fix-role-message-isolation** | 角色切换消息隔离（Loop #1 已交付） | ✅ PASS |
+| **v0.5-alpha** | SillyTavern Character Card 兼容 + C# xUnit 测试 | 📝 规划中 |
 | **v1.0** | 全功能 MCP Server + 社区预设市场 + 完整测试覆盖 | 💡 想法池 |
 
 ---
