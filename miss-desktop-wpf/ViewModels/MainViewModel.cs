@@ -82,11 +82,38 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             IsCirnoMode = value.Profile.EducationLevel == -100;
         }
+
         DispatcherHelper.Run(() =>
         {
+            if (_currentSession != null)
+            {
+                try
+                {
+                    // ① 保存当前消息到 LiteDB（防切换丢失）
+                    LocalStore.SaveMessages(_currentSession.Id, _allMessages.ToList());
+
+                    // ② 清空当前消息集合
+                    _allMessages.Clear();
+
+                    // ③ 按角色重新加载：用户消息 OR RoleName 匹配
+                    var msgs = LocalStore.LoadMessages(_currentSession.Id);
+                    foreach (var m in msgs)
+                    {
+                        if (m.IsUser || m.RoleName == value?.Name)
+                            _allMessages.Add(m);
+                    }
+
+                    // ④ 更新当前会话的角色名
+                    if (value != null)
+                        _currentSession.RoleName = value.Name;
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError($"[OnCurrentRoleChanged] 消息隔离失败: {ex}");
+                }
+            }
+
             _messagesViewSource.View.Refresh();
-            if (value != null && _currentSession != null)
-                _currentSession.RoleName = value.Name;
         });
     }
 

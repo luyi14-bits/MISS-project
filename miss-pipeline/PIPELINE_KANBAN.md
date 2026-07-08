@@ -8,8 +8,8 @@
 
 | 状态 | Spec 数 | 说明 |
 |------|---------|------|
-| ✅ **已完成** | 9 | 已发布/验收通过 |
-| 🔨 **开发中** | 1 | 角色消息隔离（T1 未开始 · T2 ✅ 已完成） |
+| ✅ **已完成** | 10 | 已发布/验收通过 |
+| 🔨 **开发中** | 0 | — |
 | 📝 **规划中** | 1 | SillyTavern 角色卡兼容 |
 | ❌ **废弃** | 1 | 技术方案变更（Tauri → pythonnet） |
 
@@ -53,7 +53,14 @@
 
 **安全效果**：78 个源文件 100% 覆盖 SPDX-License-Identifier: AGPL-3.0-or-later
 
+### fix-role-message-isolation — 角色切换消息隔离
 
+| Task | 内容 | 状态 |
+|------|------|------|
+| Task 1 | 角色切换时消息隔离（OnCurrentRoleChanged Save→Clear→Load） | ✅ |
+| Task 2 | session_id 嵌入角色名（pySessionId 已有 roleName） | ✅ |
+
+**产物**：MainViewModel.cs OnCurrentRoleChanged 实现 Save→Clear→Load，含 try-catch + Trace.TraceError
 
 ### Git 安全审计 G1-G3
 
@@ -118,15 +125,6 @@
 
 ---
 
-## 🔨 开发中
-
-### fix-role-message-isolation — 角色切换消息隔离
-
-| Task | 内容 | 状态 |
-|------|------|------|
-| Task 1 | 角色切换时消息隔离（OnCurrentRoleChanged Save→Clear→Load） | 📝 未开始 |
-| Task 2 | session_id 嵌入角色名（pySessionId 已有 roleName） | ✅ 已完成 |
-
 ## 📝 规划中
 
 ### sillytavern-card-compat — SillyTavern 角色卡兼容
@@ -176,6 +174,6 @@
 dotnet build: 0 error
 pytest:       ~190 passed
 安全审计:     A (38/38)
-Spec PASS:    9/11（fix-role-message-isolation 🔨 开发中 · sillytavern-card-compat 📝 规划中）
+Spec PASS:    10/11（fix-role-message-isolation ✅ · sillytavern-card-compat 📝 规划中）
 CLA:          已发布（提交即同意模式）
 ```
