@@ -6,7 +6,7 @@
 
 **MISS**（**M**alleable **I**ntelligent **S**ynthetic **S**oul）是一个以双轨思维引擎驱动的 AI 角色对话框架。支持 10 维动态属性调节、14 个预设角色头像、知识天花板约束和⑨模式彩蛋。新增 AI 一键角色生成（RoleFactory）、领域知识约束引擎（KnowledgeDomain）、TTS 语音合成（edge-tts）。全栈 Python + Jinja2 + FastAPI，桌面版 WPF（C#/.NET）+ pythonnet 单进程嵌入。AGPL v3 开源。
 
-pytest 全量 **~190/190** 通过 | 验收报告 **63 个问题全部追踪** | 安全等级 **A（38/38 修复）** ✅
+pytest 全量 **~190/190** 通过 | Spec **10/10 全部 PASS** | 安全等级 **A（38/38 修复）** ✅
 
 ---
 
@@ -394,12 +394,12 @@ MISS/
 ```
 █████████████████████████████████████████████
 █                                           █
-█   ALPHA v0.4 — 安全等级 A                    █
+█   BETA v0.5 — 安全等级 A                     █
 █                                           █
-█   Phase 0-7 + 全部 Spec 已 PASS。            █
-█   Phase 5: AI 角色工厂 + 领域约束 ✅          █
-█   Phase 6: TTS 语音合成 + AudioPlayer ✅     █
-█   安全 38/38 修复 + 全量回归 ~190/190。       █
+█   全部 Spec PASS（10/10）✅                  █
+█   安全 38/38 修复 + ~190/190 全量回归。       █
+█   标准文件 8/8 齐全 · AI 团队 8 人就位。       █
+█   Alpha 封板，Beta 阶段正式开启。              █
 █   欢迎 Star / Watch 以跟踪进展。             █
 █                                           █
 █████████████████████████████████████████████
@@ -425,7 +425,7 @@ MISS/
 | **Phase 5（新增）** | AI 角色工厂 + 知识领域约束引擎（精简方案：40→18 任务） | ✅ PASS |
 | **Phase 6（新增）** | TTS 语音合成（edge-tts + NAudio）、AudioPlayer | ✅ PASS |
 | **fix-role-message-isolation** | 角色切换消息隔离（Loop #1 已交付） | ✅ PASS |
-| **v0.5-alpha** | SillyTavern Character Card 兼容 + C# xUnit 测试 | 📝 规划中 |
+| **v1.0** | Beta 阶段：C# xUnit 测试 + SillyTavern 角色卡兼容 + 社区反馈 | 📝 规划中 |
 | **v1.0** | 全功能 MCP Server + 社区预设市场 + 完整测试覆盖 | 💡 想法池 |
 
 ---
