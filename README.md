@@ -356,7 +356,7 @@ MISS/
 │   └── .trae/                             # 项目工具链（不上传 Git）
     ├── specs/                         #   Spec 任务卡（10 个功能模块）
     │   ├── fix-role-save-and-ui/       #     角色创建 + UI 修复 ✅
-    │   ├── desktop-packaging/          #     Tauri 桌面版 v2 ✅
+    │   ├── desktop-packaging/          #     Tauri 桌面版 ❌ 废弃
     │   ├── desktop-rebuild/            #     WPF MVVM 重构 ✅
     │   ├── desktop-polish/             #     桌面版细节打磨 ✅
     │   ├── fix-binding-and-api/        #     绑定 + API 修复 ✅
@@ -364,7 +364,7 @@ MISS/
     │   ├── fix-license-headers/        #     全项目版权头补全 ✅
     │   ├── fix-residual-risks/         #     加密/SSRF 残余风险修复 ✅
     │   ├── phase5-role-factory-tts/    #     AI 角色工厂 + TTS 语音 ✅
-    │   └── fix-role-message-isolation/ #     角色消息隔离修复 📝 规划中
+    │   └── fix-role-message-isolation/ #     角色消息隔离修复 🔨 开发中
     └── skills/                        #   项目 Skill 库（7 个团队角色规范 v3）
         ├── acceptance-testing/         #     验收报告标准（v3：验收人准则+陷阱清单）
         ├── coding-ethics/              #     编程八荣八耻（v3：XAML/线程安全/LiteDB）
@@ -404,7 +404,7 @@ MISS/
 | **Phase 0-4** | 核心引擎 + API + 记忆系统 | ✅ PASS |
 | **Phase 7** | 单元测试 + 集成测试 | ✅ PASS |
 | **fix-role-save-and-ui** | 角色创建保存 + 全界面"角色"命名统一 | ✅ PASS |
-| **desktop-packaging** | Tauri 桌面版 v2 | ✅ PASS |
+| **desktop-packaging** | Tauri 桌面版 v2 | ❌ 废弃 |
 | **desktop-rebuild** | WPF MVVM 重构（pythonnet 单进程） | ✅ PASS |
 | **desktop-polish** | 全线 21 项修复（启动线程/主题/IO/日志） | ✅ PASS |
 | **fix-binding-and-api** | 推理模型兼容 + 属性面板/标题栏/设置持久化 | ✅ PASS |
@@ -414,8 +414,9 @@ MISS/
 | **安全审计 5 阶段** | 认证·加密·限流·去匿名化·打包（38/38） | ✅ PASS |
 | **Phase 5（新增）** | AI 角色工厂 + 知识领域约束引擎（精简方案：40→18 任务） | ✅ PASS |
 | **Phase 6（新增）** | TTS 语音合成（edge-tts + NAudio）、AudioPlayer | ✅ PASS |
-| **fix-role-message-isolation** | 角色切换消息隔离 | 📝 规划中 |
-| **v0.6** | C# 单元测试基础设施 + 角色隔离验收通过 | 📝 规划中 |
+| **fix-role-message-isolation** | 角色切换消息隔离 | 🔨 开发中 |
+| **sillytavern-card-compat** | SillyTavern 角色卡兼容（导入/导出 PNG） | 📝 规划中 |
+| **v0.6** | C# 单元测试基础设施 | 📝 规划中 |
 | **v1.0** | 全功能 MCP Server + 社区预设市场 + 完整测试覆盖 | 💡 想法池 |
 
 ---
