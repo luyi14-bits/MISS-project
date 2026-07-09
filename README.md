@@ -264,7 +264,7 @@ MISS/
 │   ├── p-icequeen.jpg                #   冰山美人
 │   └── p-*.jpg                       #   8 个扩展角色
 │
-├── docs/                             # 项目文档（5 份技术文档 + release notes）
+├── docs/                             # 项目文档（6 份技术文档 + release notes + SOP）
 │   ├── 技术白皮书.md                   #   C#/Python 全栈架构
 │   ├── 安全技术文档.md                 #   安全等级 A · 38 项修复 · 5 阶段审计
 │   ├── 验收测试技术文档.md              #   63 问题追踪 · 190 pytest · 双轨测试
