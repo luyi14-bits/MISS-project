@@ -1,6 +1,7 @@
 // Copyright (C) 2026  MISS Project Contributors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -122,36 +123,73 @@ public partial class ConversationView : UserControl
 
         if (wavAudio.Length == 0) return;
 
-        await Dispatcher.InvokeAsync(async () =>
+        SttButton.IsEnabled = false;
+        SttButton.Content = "⋯";
+        SttButton.ToolTip = "识别中...";
+
+        try
         {
-            SttButton.IsEnabled = false;
-            SttButton.Content = "⋯";
-            SttButton.ToolTip = "识别中...";
-
-            try
+            // 模型初始化（可能会下载 ~75MB，在后台线程执行）
+            string? initError = null;
+            if (!_whisperStt.IsReady)
             {
-                if (!_whisperStt.IsReady)
-                    await _whisperStt.InitializeAsync();
+                SttButton.Content = "↓";
+                SttButton.ToolTip = "下载模型...";
+                initError = await Task.Run(() => _whisperStt.InitializeAsync());
+            }
 
-                string text = await _whisperStt.TranscribeAsync(wavAudio);
-                if (!string.IsNullOrEmpty(text))
+            await Dispatcher.InvokeAsync(() =>
+            {
+                if (initError != null)
                 {
-                    MessageInput.Text = text;
-                    MessageInput.CaretIndex = text.Length;
+                    NotificationService.Error(initError);
+                    return;
                 }
-            }
-            catch (Exception ex)
-            {
-                NotificationService.Error($"语音识别失败：{ex.Message}");
-            }
-            finally
+
+                _ = TranscribeAndFillAsync(wavAudio);
+            });
+        }
+        catch (Exception ex)
+        {
+            await Dispatcher.InvokeAsync(() =>
+                NotificationService.Error($"语音识别失败：{ex.Message}"));
+        }
+        finally
+        {
+            await Dispatcher.InvokeAsync(() =>
             {
                 SttButton.IsEnabled = true;
                 SttButton.Content = "🎤";
                 SttButton.FontSize = 16;
                 SttButton.ToolTip = "按住说话 (语音输入)";
-            }
-        });
+            });
+        }
+    }
+
+    private async Task TranscribeAndFillAsync(byte[] wavAudio)
+    {
+        try
+        {
+            string text = await Task.Run(() => _whisperStt.TranscribeAsync(wavAudio));
+            await Dispatcher.InvokeAsync(() =>
+            {
+                if (!string.IsNullOrEmpty(text) && !text.StartsWith("[识别错误"))
+                {
+                    MessageInput.Text = text;
+                    MessageInput.CaretIndex = text.Length;
+                }
+                else if (text.StartsWith("[识别错误"))
+                {
+                    NotificationService.Error(text);
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            Trace.TraceError($"[STT] 转写异常: {ex}");
+            await Dispatcher.InvokeAsync(() =>
+                NotificationService.Error($"语音识别失败：{ex.Message}"));
+        }
     }
 
     private async Task SendMessage()

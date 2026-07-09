@@ -1,15 +1,17 @@
 // Copyright (C) 2026  MISS Project Contributors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Whisper.net;
+using Whisper.net.Ggml;
 
 namespace MISS.Services;
 
 /// <summary>
-/// Speech-to-text service using Whisper.net (local inference, completely offline).
-/// Downloads ggml-tiny.bin (~75MB) on first use to %APPDATA%/MISS/whisper/.
+/// Speech-to-text service using Whisper.net (local inference, completely offline after model download).
+/// Downloads ggml-tiny.bin (~75MB) on first use.
 /// </summary>
 public class WhisperSttService
 {
@@ -29,64 +31,72 @@ public class WhisperSttService
 
     /// <summary>
     /// Ensure the Whisper model is downloaded and the processor is initialized.
+    /// Returns human-readable error message on failure, null on success.
     /// </summary>
-    public async Task InitializeAsync()
+    public async Task<string?> InitializeAsync()
     {
-        if (_initialized) return;
+        if (_initialized) return null;
 
-        Directory.CreateDirectory(_modelDir);
-
-        if (!File.Exists(_modelPath))
+        try
         {
-            // Download ggml-tiny.bin from HuggingFace
-            var url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin";
-            using var httpClient = new System.Net.Http.HttpClient();
-            httpClient.Timeout = System.TimeSpan.FromMinutes(5);
-            var response = await httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode();
+            Directory.CreateDirectory(_modelDir);
 
-            await using var fileStream = File.Create(_modelPath);
-            await response.Content.CopyToAsync(fileStream);
+            if (!File.Exists(_modelPath))
+            {
+                Trace.TraceInformation("[WhisperSttService] 开始下载识别模型 ggml-tiny.bin (~75MB)...");
+                var downloader = WhisperGgmlDownloader.Default;
+                await using var modelStream = await downloader.GetGgmlModelAsync(GgmlType.Tiny);
+                await using var fileWriter = File.Create(_modelPath);
+                await modelStream.CopyToAsync(fileWriter);
+                Trace.TraceInformation("[WhisperSttService] 模型下载完成");
+            }
+
+            _factory = WhisperFactory.FromPath(_modelPath);
+            _processor = _factory.CreateBuilder()
+                .WithLanguage("zh")
+                .Build();
+
+            _initialized = true;
+            Trace.TraceInformation("[WhisperSttService] 语音识别引擎就绪");
+            return null;
         }
-
-        _factory = WhisperFactory.FromPath(_modelPath);
-        _processor = _factory.CreateBuilder()
-            .WithLanguage("zh")
-            .Build();
-
-        _initialized = true;
+        catch (Exception ex)
+        {
+            Trace.TraceError($"[WhisperSttService] 初始化失败: {ex.Message}");
+            return $"语音模型初始化失败，请检查网络连接后重启应用。\n详情: {ex.Message}";
+        }
     }
 
     /// <summary>
-    /// Transcribe WAV audio bytes to text.
-    /// Must call InitializeAsync() first.
+    /// Transcribe 16-bit 16kHz mono PCM WAV audio bytes to text.
+    /// Call InitializeAsync() first.
     /// </summary>
     public async Task<string> TranscribeAsync(byte[] wavAudio)
     {
         if (!_initialized)
-            throw new System.InvalidOperationException("WhisperSttService not initialized. Call InitializeAsync() first.");
+            throw new System.InvalidOperationException("WhisperSttService 未初始化，请先调用 InitializeAsync()");
 
-        if (_processor == null)
-            return "";
+        if (_processor == null) return "";
 
         var result = new System.Text.StringBuilder();
 
-        await using var memoryStream = new MemoryStream(wavAudio);
-        await foreach (var segment in _processor.ProcessAsync(memoryStream))
+        try
         {
-            result.Append(segment.Text);
+            await using var memoryStream = new MemoryStream(wavAudio);
+            await foreach (var segment in _processor.ProcessAsync(memoryStream))
+            {
+                result.Append(segment.Text);
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.TraceError($"[WhisperSttService] 转写失败: {ex.Message}");
+            return $"[识别错误: {ex.Message}]";
         }
 
         return result.ToString().Trim();
     }
 
-    /// <summary>
-    /// Whether the model is ready.
-    /// </summary>
     public bool IsReady => _initialized;
-
-    /// <summary>
-    /// Model file size on disk, or 0 if not downloaded.
-    /// </summary>
     public long ModelFileSize => File.Exists(_modelPath) ? new FileInfo(_modelPath).Length : 0;
 }

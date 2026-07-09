@@ -22,5 +22,6 @@
     <PackageReference Include="LiteDB" Version="5.*" />
     <PackageReference Include="NAudio" Version="2.*" />
     <PackageReference Include="Whisper.net" Version="1.9.1" />
+    <PackageReference Include="Whisper.net.Runtime" Version="1.9.1" />
   </ItemGroup>
 </Project>
