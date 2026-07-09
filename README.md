@@ -4,9 +4,9 @@
 >
 > MISS 不是预制角色的集合——她是零基线的空白画布。你的每一次滑动条调节，不是在微调一个已有的 AI 女友模板，而是在从零开始定义"她"是谁。
 
-**MISS**（**M**alleable **I**ntelligent **S**ynthetic **S**oul）是一个以双轨思维引擎驱动的 AI 角色对话框架。支持 10 维动态属性调节、14 个预设角色头像、知识天花板约束和⑨模式彩蛋。新增 AI 一键角色生成（RoleFactory）、领域知识约束引擎（KnowledgeDomain）、TTS 语音合成（edge-tts）。全栈 Python + Jinja2 + FastAPI，桌面版 WPF（C#/.NET）+ pythonnet 单进程嵌入。AGPL v3 开源。
+**MISS**（**M**alleable **I**ntelligent **S**ynthetic **S**oul）是一个以双轨思维引擎驱动的 AI 角色对话框架。支持 10 维动态属性调节、ST 角色卡导入/导出、知识天花板约束和⑨模式彩蛋。新增 AI 角色工厂、知识领域约束、TTS 语音合成、Whisper 离线语音输入。全栈 Python + Jinja2 + FastAPI，桌面版 WPF（C#/.NET）+ pythonnet 单进程嵌入。AGPL v3 开源。
 
-pytest 全量 **~190/190** 通过 | Spec **10/10 全部 PASS** | 安全等级 **A（38/38 修复）** ✅
+pytest **~190/190** · xUnit **9/9** · Spec **10/10 PASS** · 安全 **A（38/38）** ✅
 
 ---
 
@@ -346,7 +346,15 @@ MISS/
 │   ├── ViewModels/
 │   │   └── MainViewModel.cs           #   MVVM 核心状态（CommunityToolkit.Mvvm）
 │   ├── Views/                         #   XAML 视图（8 个页面/控件）
-│   ├── Services/                      #   C# 服务层（PythonBridge、LiteDB、日志）
+│   ├── Services/                      #   C# 服务层（8 个服务 + 5 项功能）
+│   ├── PythonBridge.cs             #     pythonnet 桥接
+│   ├── AudioRecorder.cs            #     🆕 NAudio Push-to-Talk 录音
+│   ├── WhisperSttService.cs        #     🆕 Whisper 离线语音转写
+│   ├── TavernCardParser.cs         #     🆕 ST V3 PNG 解析器
+│   ├── TavernCardExporter.cs       #     🆕 ST V3 PNG 导出器
+│   ├── ConversationExporter.cs     #     🆕 对话导出（JSON/HTML/MD）
+│   ├── AudioPlayer.cs              #     MP3 播放
+│   └── LiteDbLocalStore.cs         #     加密持久化
 │   ├── Models/                        #   C# 数据模型（API 响应、角色、会话）
 │   ├── Controls/                      #   自定义控件
 │   ├── Resources/                     #   样式 + 头像素材
@@ -396,10 +404,9 @@ MISS/
 █                                           █
 █   BETA v0.6 — 安全等级 A                     █
 █                                           █
-█   全部 Spec PASS（10/10）✅                  █
-█   安全 38/38 修复 + ~190/190 全量回归。       █
-█   标准文件 8/8 齐全 · AI 团队 8 人就位。       █
-█   Alpha 封板，Beta 阶段正式开启。              █
+█   ST 角色卡 · Whisper STT · xUnit 9/9 ✅      █
+█   全部 Spec PASS（10/10）· 安全 38/38。       █
+█   标准文件 8/8 · AI 团队 8 人 · 想法池 6 项。    █
 █   欢迎 Star / Watch 以跟踪进展。             █
 █                                           █
 █████████████████████████████████████████████
@@ -426,8 +433,9 @@ MISS/
 | **Phase 6（新增）** | TTS 语音合成（edge-tts + NAudio）、AudioPlayer | ✅ PASS |
 | **fix-role-message-isolation** | 角色切换消息隔离（Loop #1 已交付） | ✅ PASS |
 | **对话导出** | JSON/HTML/Markdown 三格式，对话栏 📥 按钮 | ✅ PASS |
-| **sillytavern-card-compat** | SillyTavern V3 角色卡 PNG 导入/导出 | ✅ PASS |
-| **v1.0** | C# xUnit 单元测试 + 语音输入 STT (Whisper) | 📝 规划中 |
+| **sillytavern-card-compat** | SillyTavern V3 角色卡 PNG 导入/导出 (5 Tasks) | ✅ PASS |
+| **xUnit 测试** | C# 单元测试基础设施，CoreDomainTests 9/9 PASS | ✅ PASS |
+| **语音输入 STT** | Whisper.net ggml-tiny 离线转写，🎤 Push-to-Talk | ✅ PASS |
 | **v1.0** | 全功能 MCP Server + 社区预设市场 + 完整测试覆盖 | 💡 想法池 |
 
 ---
