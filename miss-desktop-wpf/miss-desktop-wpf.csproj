@@ -9,17 +9,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <Resource Include="Resources\Images\*.jpg"/>
+    <Resource Include="Resources\Images\*.jpg" />
     <Content Include="Resources\Images\*.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="pythonnet" Version="3.*"/>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*"/>
-    <PackageReference Include="Microsoft.ML.Tokenizers" Version="1.*"/>
-    <PackageReference Include="Microsoft.ML.Tokenizers.Data.O200kBase" Version="1.*"/>
-    <PackageReference Include="LiteDB" Version="5.*"/>
-    <PackageReference Include="NAudio" Version="2.*"/>
+    <PackageReference Include="pythonnet" Version="3.*" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+    <PackageReference Include="Microsoft.ML.Tokenizers" Version="1.*" />
+    <PackageReference Include="Microsoft.ML.Tokenizers.Data.O200kBase" Version="1.*" />
+    <PackageReference Include="LiteDB" Version="5.*" />
+    <PackageReference Include="NAudio" Version="2.*" />
+    <PackageReference Include="Whisper.net" Version="1.9.1" />
   </ItemGroup>
 </Project>

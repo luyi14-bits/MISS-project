@@ -136,6 +136,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBox x:Name="MessageInput" Grid.Column="0"
@@ -147,12 +148,19 @@
                          KeyDown="MessageInput_KeyDown"
                          TextWrapping="Wrap" AcceptsReturn="False"/>
 
-                <CheckBox x:Name="StreamToggle" Grid.Column="1"
+                <Button x:Name="SttButton" Grid.Column="1"
+                        Content="🎤" Width="34" Height="34"
+                        Style="{DynamicResource IconButtonStyle}"
+                        PreviewMouseLeftButtonDown="SttButton_PreviewMouseDown"
+                        PreviewMouseLeftButtonUp="SttButton_PreviewMouseUp"
+                        FontSize="16" ToolTip="按住说话 (语音输入)"/>
+
+                <CheckBox x:Name="StreamToggle" Grid.Column="2"
                           Content="流式" IsChecked="True"
                           VerticalAlignment="Center" Margin="8,0,4,0"
                           Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
 
-                <Button x:Name="SendButton" Grid.Column="2"
+                <Button x:Name="SendButton" Grid.Column="3"
                         Content="发送"
                         Style="{DynamicResource PrimaryButtonStyle}"
                         Click="SendButton_Click" Padding="20,8"/>

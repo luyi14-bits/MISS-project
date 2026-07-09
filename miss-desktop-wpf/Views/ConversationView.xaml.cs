@@ -15,6 +15,8 @@ namespace MISS.Views;
 public partial class ConversationView : UserControl
 {
     private MainViewModel VM => MainViewModel.Instance;
+    private readonly AudioRecorder _audioRecorder = new();
+    private readonly WhisperSttService _whisperStt = new();
 
     public ConversationView()
     {
@@ -95,6 +97,61 @@ public partial class ConversationView : UserControl
         {
             NotificationService.Error($"导出失败：{ex.Message}");
         }
+    }
+
+    private void SttButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        SttButton.Content = "🔴";
+        SttButton.FontSize = 14;
+        SttButton.ToolTip = "录音中... 松开结束";
+        _audioRecorder.OnRecordingFinished += OnSttFinished;
+        _audioRecorder.Start();
+    }
+
+    private void SttButton_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        _audioRecorder.Stop();
+        SttButton.Content = "🎤";
+        SttButton.FontSize = 16;
+        SttButton.ToolTip = "按住说话 (语音输入)";
+    }
+
+    private async void OnSttFinished(byte[] wavAudio)
+    {
+        _audioRecorder.OnRecordingFinished -= OnSttFinished;
+
+        if (wavAudio.Length == 0) return;
+
+        await Dispatcher.InvokeAsync(async () =>
+        {
+            SttButton.IsEnabled = false;
+            SttButton.Content = "⋯";
+            SttButton.ToolTip = "识别中...";
+
+            try
+            {
+                if (!_whisperStt.IsReady)
+                    await _whisperStt.InitializeAsync();
+
+                string text = await _whisperStt.TranscribeAsync(wavAudio);
+                if (!string.IsNullOrEmpty(text))
+                {
+                    MessageInput.Text = text;
+                    MessageInput.CaretIndex = text.Length;
+                }
+            }
+            catch (Exception ex)
+            {
+                NotificationService.Error($"语音识别失败：{ex.Message}");
+            }
+            finally
+            {
+                SttButton.IsEnabled = true;
+                SttButton.Content = "🎤";
+                SttButton.FontSize = 16;
+                SttButton.ToolTip = "按住说话 (语音输入)";
+            }
+        });
     }
 
     private async Task SendMessage()

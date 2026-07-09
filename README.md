@@ -394,7 +394,7 @@ MISS/
 ```
 █████████████████████████████████████████████
 █                                           █
-█   BETA v0.5 — 安全等级 A                     █
+█   BETA v0.6 — 安全等级 A                     █
 █                                           █
 █   全部 Spec PASS（10/10）✅                  █
 █   安全 38/38 修复 + ~190/190 全量回归。       █
@@ -425,7 +425,9 @@ MISS/
 | **Phase 5（新增）** | AI 角色工厂 + 知识领域约束引擎（精简方案：40→18 任务） | ✅ PASS |
 | **Phase 6（新增）** | TTS 语音合成（edge-tts + NAudio）、AudioPlayer | ✅ PASS |
 | **fix-role-message-isolation** | 角色切换消息隔离（Loop #1 已交付） | ✅ PASS |
-| **v1.0** | Beta 阶段：C# xUnit 测试 + SillyTavern 角色卡兼容 + 社区反馈 | 📝 规划中 |
+| **对话导出** | JSON/HTML/Markdown 三格式，对话栏 📥 按钮 | ✅ PASS |
+| **sillytavern-card-compat** | SillyTavern V3 角色卡 PNG 导入/导出 | ✅ PASS |
+| **v1.0** | C# xUnit 单元测试 + 语音输入 STT (Whisper) | 📝 规划中 |
 | **v1.0** | 全功能 MCP Server + 社区预设市场 + 完整测试覆盖 | 💡 想法池 |
 
 ---
