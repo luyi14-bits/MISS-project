@@ -56,6 +56,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly CollectionViewSource _messagesViewSource = new();
 
     public ICollectionView MessagesView => _messagesViewSource.View;
+    public ObservableCollection<ChatMessage> Messages => _allMessages;
 
     public MainViewModel()
     {

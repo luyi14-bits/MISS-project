@@ -47,6 +47,9 @@
                     <Button Content="⚙" Width="28" Height="28"
                             Style="{DynamicResource IconButtonStyle}"
                             Click="OpenSettings_Click"/>
+                    <Button Content="📥" Width="28" Height="28"
+                            Style="{DynamicResource IconButtonStyle}"
+                            Click="ExportConversation_Click" FontSize="13" ToolTip="导出对话"/>
                 </StackPanel>
             </Grid>
         </Border>
