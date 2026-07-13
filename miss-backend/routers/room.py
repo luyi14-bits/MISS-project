@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class RoomChatRequest(BaseModel):
     session_id: str = Field(max_length=64)
     message: str = Field(min_length=1, max_length=4000)
-    characters: list[dict] = Field(description="List of {name, profile, background} per character")
+    characters: list[dict] = Field(default_factory=list, max_length=8, description="List of {name, profile, background} per character, max 8")
 
 
 router = APIRouter()

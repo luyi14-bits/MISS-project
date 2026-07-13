@@ -139,8 +139,9 @@ async def _stream_impl(session_id: str, message: str, characters: list[dict], q:
                         payload_str = sse_line.replace("data: ", "").strip()
                         payload = json.loads(payload_str)
                         spoken_full += payload.get("text", "")
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        import logging
+                        logging.getLogger(__name__).warning("room stream json parse failed: %s", e)
         except Exception:
             logger.error("Room stream failed for %s", char_name, exc_info=True)
 
