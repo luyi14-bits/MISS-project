@@ -8,7 +8,7 @@ from .attribute_engine import (
     AttributePromptMapper,
 )
 from .memory_manager import ConversationStore
-from config import config
+from config import config, get_conversation_window_size
 
 
 class PromptBuilder:
@@ -51,7 +51,7 @@ class PromptBuilder:
 
         try:
             conversation_window = self._conversation_store.get_window(
-                session_id, n=config.conversation_window_size
+                session_id, n=get_conversation_window_size()
             )
         except OperationalError:
             conversation_window = []

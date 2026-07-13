@@ -431,8 +431,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
                         if (!string.IsNullOrEmpty(chunk.InnerThought))
                             missMsg.InnerThought = chunk.InnerThought;
                     }
+                    else if (chunk?.Error == true)
+                    {
+                        Trace.TraceError($"[Stream] _error from backend: {chunk.ErrorMessage}");
+                    }
                 }
-                catch { }
+                catch (System.Text.Json.JsonException je)
+                {
+                    Trace.TraceError($"[Stream] JSON parse failed: {je.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError($"[Stream] unexpected: {ex.Message}");
+                }
             }
             else
             {

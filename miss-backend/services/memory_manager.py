@@ -6,7 +6,7 @@ from database import SessionLocal
 from models.message import Message as MessageModel
 from models.session import Session
 from models.memory import MemoryEntry as MemoryEntryModel
-from config import config
+from config import config, get_conversation_window_size
 from .crypto import encrypt as _encrypt, decrypt as _decrypt
 
 
@@ -56,7 +56,7 @@ class ConversationStore:
             db.close()
 
     def get_window(self, session_id: str, n: int = 20) -> list[dict]:
-        n = n or config.conversation_window_size
+        n = n or get_conversation_window_size()
         db = SessionLocal()
         try:
             rows = (

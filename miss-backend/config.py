@@ -69,6 +69,14 @@ def get_model():
         return _runtime_overrides.get("model") or config.model
 
 
+def get_conversation_window_size() -> int:
+    """对推理模型自动缩小窗口，避免 token 超限。"""
+    model = get_model()
+    if any(kw in model.lower() for kw in ("reasoner", "deepseek", "v3", "v4", "o1", "o3")):
+        return min(config.conversation_window_size, 8)
+    return config.conversation_window_size
+
+
 def apply_runtime_settings(settings: dict):
     global _runtime_overrides
     with _runtime_lock:

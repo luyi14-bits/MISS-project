@@ -243,6 +243,13 @@ class LLMCaller:
             model_config = {}
 
         model = model_config.get("model") or get_model() or config.model
+
+        # DeepSeek/o1 等推理模型流式不支持 instructor response_model，直接走裸 API
+        if _is_reasoning_model(model):
+            async for chunk in self._raw_stream(messages, model_config):
+                yield chunk
+            return
+
         kwargs = {
             "model": model,
             "messages": messages,
@@ -270,13 +277,21 @@ class LLMCaller:
             yield f"data: {payload}\n\n"
             return
         except Exception as e:
-            yield f"data: {json.dumps({'_error': True, 'message': str(e), '_stage': 'instructor'}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({'_error': True, 'message': str(e)[:200]}, ensure_ascii=False)}\n\n"
 
         # Level 2/3 fallback: raw API stream without instructor
+        async for chunk in self._raw_stream(messages, model_config):
+            yield chunk
+
+    async def _raw_stream(self, messages: list[dict], model_config: dict | None = None) -> AsyncGenerator[str, None]:
+        """直接裸 API 流式，跳过 instructor。用于 DeepSeek 等推理模型。"""
+        if model_config is None:
+            model_config = {}
+        key = self._api_key or get_api_key()
+        base = get_base_url()
+        model = model_config.get("model") or get_model() or config.model
+        raw_client = AsyncOpenAI(api_key=key, base_url=base) if base else AsyncOpenAI(api_key=key)
         try:
-            key = self._api_key or get_api_key()
-            base = get_base_url()
-            raw_client = AsyncOpenAI(api_key=key, base_url=base) if base else AsyncOpenAI(api_key=key)
             response = await raw_client.chat.completions.create(
                 model=model,
                 messages=messages,

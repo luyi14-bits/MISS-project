@@ -83,6 +83,7 @@ async def chat(request: Request, req: ChatRequest):
 @router.post("/chat/stream")
 @limiter.limit("10/minute")
 async def chat_stream(request: Request, req: ChatRequest):
+    _caller.flush_client()
     ctx = _builder.build_full(req.session_id, req.message, req.profile, req.background)
     messages = ctx["messages"]
     spoken_full = ""

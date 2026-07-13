@@ -29,6 +29,12 @@ public class ChatResponse
     [JsonPropertyName("active_cross_effects")]
     public List<CrossEffect> ActiveCrossEffects { get; set; } = new();
 
+    [JsonPropertyName("_error")]
+    public bool Error { get; set; }
+
+    [JsonPropertyName("message")]
+    public string? ErrorMessage { get; set; }
+
     [JsonPropertyName("diag")]
     public Dictionary<string, object>? Diag { get; set; }
 }

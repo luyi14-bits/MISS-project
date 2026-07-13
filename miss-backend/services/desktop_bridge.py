@@ -207,6 +207,7 @@ async def _do_chat(session_id: str, message: str, profile: BridgeProfile, backgr
 
 def chat_stream(session_id: str, message: str, profile_dict: dict, background: str = ""):
     """Synchronous generator wrapping async LLM stream via Queue(maxsize=100) + daemon thread + threading.Event."""
+    _llm_caller.flush_client()
     try:
         message = _validate_message(message)
         session_id = _validate_session(session_id)
