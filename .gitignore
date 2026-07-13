@@ -86,6 +86,7 @@ miss-market-research/
 miss-pipeline/
 .reasonix/
 reasonix.toml
+.trae/skills/
 
 # ========================================
 # OS
