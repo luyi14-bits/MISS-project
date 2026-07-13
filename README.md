@@ -4,9 +4,9 @@
 >
 > MISS 不是预制角色的集合——她是零基线的空白画布。你的每一次滑动条调节，不是在微调一个已有的 AI 女友模板，而是在从零开始定义"她"是谁。
 
-**MISS**（**M**alleable **I**ntelligent **S**ynthetic **S**oul）是一个以双轨思维引擎驱动的 AI 角色对话框架。支持 10 维动态属性调节、ST 角色卡导入/导出、知识天花板约束和⑨模式彩蛋。新增 AI 角色工厂、知识领域约束、TTS 语音合成、Whisper 离线语音输入。全栈 Python + Jinja2 + FastAPI，桌面版 WPF（C#/.NET）+ pythonnet 单进程嵌入。AGPL v3 开源。
+**MISS**（**M**alleable **I**ntelligent **S**ynthetic **S**oul）是一个以双轨思维引擎驱动的 AI 角色对话框架。支持 10 维动态属性调节、ST 角色卡导入/导出、知识天花板约束和⑨模式彩蛋。新增 AI 角色工厂、知识领域约束、TTS 语音合成、Whisper 离线语音输入、多人角色房间。全栈 Python + Jinja2 + FastAPI，桌面版 WPF（C#/.NET）+ pythonnet 单进程嵌入。AGPL v3 开源。
 
-pytest **~190/190** · xUnit **9/9** · Spec **10/10 PASS** · 安全 **A（38/38）** ✅
+pytest **~190/190** · xUnit **9/9** · Spec **15/15 PASS** · 安全 **A（51/51）** ✅
 
 ---
 
@@ -402,11 +402,11 @@ MISS/
 ```
 █████████████████████████████████████████████
 █                                           █
-█   BETA v0.6 — 安全等级 A                     █
+█   BETA v0.7 — 安全等级 A                     █
 █                                           █
-█   ST 角色卡 · Whisper STT · xUnit 9/9 ✅      █
-█   全部 Spec PASS（10/10）· 安全 38/38。       █
-█   标准文件 8/8 · AI 团队 8 人 · 想法池 6 项。    █
+█   多人角色房间 · DeepSeek 兼容 · 安全 51/51 ✅  █
+█   Spec 15/15 PASS · xUnit 9/9 · pytest 190  █
+█   标准文件 8/8 · 想法池 3 项。                █
 █   欢迎 Star / Watch 以跟踪进展。             █
 █                                           █
 █████████████████████████████████████████████
@@ -436,6 +436,9 @@ MISS/
 | **sillytavern-card-compat** | SillyTavern V3 角色卡 PNG 导入/导出 (5 Tasks) | ✅ PASS |
 | **xUnit 测试** | C# 单元测试基础设施，CoreDomainTests 9/9 PASS | ✅ PASS |
 | **语音输入 STT** | Whisper.net ggml-tiny 离线转写，🎤 Push-to-Talk | ✅ PASS |
+| **多人角色房间** | 后端 API + C# 桥接 + UI（广播模型 + 上下文感知） | ✅ PASS |
+| **DeepSeek 兼容修复** | 流式沉默失败 5 项修复 + 非流式 instructor 跳过 | ✅ PASS |
+| **安全增量审计** | N01-N13 修复（sessionStorage / PDB / DB 清理 / Schema 校验） | ✅ PASS |
 | **v1.0** | 全功能 MCP Server + 社区预设市场 + 完整测试覆盖 | 💡 想法池 |
 
 ---
