@@ -71,6 +71,11 @@ class LLMCaller:
         if model_config is None:
             model_config = {}
         model = model_config.get("model") or get_model() or config.model
+
+        # DeepSeek/o1/o3: skip instructor, go raw API
+        if _is_reasoning_model(model):
+            return await self._call_raw(messages, model_config)
+
         start = time.time()
 
         try:
@@ -315,6 +320,57 @@ class LLMCaller:
             yield f"data: {payload}\n\n"
         except Exception as e:
             yield f"data: {json.dumps({'_error': True, 'message': str(e)[:200]}, ensure_ascii=False)}\n\n"
+
+    async def _call_raw(self, messages: list[dict], model_config: dict | None = None) -> dict:
+        """直接裸 API 调用，不经过 instructor。用于 DeepSeek 等推理模型。"""
+        if model_config is None:
+            model_config = {}
+        key = self._api_key or get_api_key()
+        base = get_base_url()
+        model = model_config.get("model") or get_model() or config.model
+        start = time.time()
+
+        # Level 1: json_object mode
+        try:
+            client = AsyncOpenAI(api_key=key, base_url=base) if base else AsyncOpenAI(api_key=key)
+            resp = await asyncio.wait_for(
+                client.chat.completions.create(
+                    model=model, messages=messages,
+                    temperature=model_config.get("temperature", config.temperature),
+                    max_tokens=model_config.get("max_tokens", config.max_tokens),
+                    response_format={"type": "json_object"},
+                ), timeout=60.0)
+            parsed = json.loads(resp.choices[0].message.content or "{}")
+            ms = int((time.time() - start) * 1000)
+            logger.info("[LLM] _call_raw L1: model=%s, time=%dms", model, ms)
+            return {"inner_thought": str(parsed.get("inner_thought", "")), "spoken": str(parsed.get("spoken", ""))}
+        except Exception as e:
+            logger.warning("[LLM] _call_raw L1 failed (%s: %s), fallback L2", type(e).__name__, e)
+
+        # Level 2: system-prefixed JSON instruction
+        try:
+            client = AsyncOpenAI(api_key=key, base_url=base) if base else AsyncOpenAI(api_key=key)
+            l2_messages = [
+                {"role": "system", "content": '你必须只回复一个JSON: {"inner_thought":"内心独白","spoken":"说出口的话"}'},
+                *messages,
+            ]
+            resp = await asyncio.wait_for(
+                client.chat.completions.create(
+                    model=model, messages=l2_messages,
+                    temperature=model_config.get("temperature", config.temperature),
+                    max_tokens=model_config.get("max_tokens", config.max_tokens),
+                ), timeout=60.0)
+            content = (resp.choices[0].message.content or "")[:10000]
+            parsed = json.loads(content)
+            ms = int((time.time() - start) * 1000)
+            logger.info("[LLM] _call_raw L2: model=%s, time=%dms", model, ms)
+            return {"inner_thought": str(parsed.get("inner_thought", "")), "spoken": str(parsed.get("spoken", ""))}
+        except json.JSONDecodeError:
+            logger.warning("[LLM] _call_raw L2 json parse failed, content[:200]=%s", content[:200] if 'content' in dir() else 'N/A')
+            return {"inner_thought": "", "spoken": "响应格式异常，请重试", "_error": True}
+        except Exception as e:
+            logger.warning("[LLM] _call_raw L2 failed: %s", e)
+            return {"inner_thought": "", "spoken": "抱歉，我暂时无法回应。请稍后再试。", "_error": True, "message": str(e)[:200]}
 
     @staticmethod
     def _parse_json_response(raw: str) -> dict:

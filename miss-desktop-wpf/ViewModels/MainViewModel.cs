@@ -421,6 +421,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 var json = token[6..];
                 try
                 {
+                    using var doc = System.Text.Json.JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("_error", out var errElem) && errElem.GetBoolean())
+                    {
+                        var errMsg = doc.RootElement.TryGetProperty("message", out var msgElem)
+                            ? msgElem.GetString() : "未知错误";
+                        Trace.TraceError($"[Stream] _error token: {errMsg}");
+                        continue;
+                    }
                     var chunk = System.Text.Json.JsonSerializer.Deserialize<ChatResponse>(
                         json, new System.Text.Json.JsonSerializerOptions
                         { PropertyNameCaseInsensitive = true });
