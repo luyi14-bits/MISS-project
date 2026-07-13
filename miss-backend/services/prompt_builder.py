@@ -74,6 +74,69 @@ class PromptBuilder:
             "active_cross_effects": active_cross_effects,
         }
 
+    def build_room_prompt(self, session_id: str, user_message: str, profile: MISSProfile,
+                          character_name: str, room_characters: list[str],
+                          character_background: str = "",
+                          allowed_domains: list[str] | None = None) -> dict:
+        """Build a room-aware prompt where character_name knows room_characters exist."""
+        eggs = self._easter_egg_engine.evaluate(profile)
+        cross_effects = self._cross_effect_calc.calculate(profile)
+        attribute_xml = self._attribute_mapper.map_all(profile)
+
+        recalled = []
+        if self._vector_store:
+            try:
+                recalled = self._vector_store.recall(query=user_message, top_k=5)
+            except Exception as e:
+                import logging
+                logging.warning("[降级] vector_store.recall 失败: %s", e)
+        if not recalled:
+            recalled = self._conversation_store.recall(session_id, user_message)
+
+        # Build room context string
+        other_characters = [n for n in room_characters if n != character_name]
+        room_context = ""
+        if other_characters:
+            room_context = f"你正在一个多人聊天室中。房间里还有以下角色：{'、'.join(other_characters)}。你会听到他们说的话，并根据你的性格做出回应。"
+
+        system_prompt = self._render_template(
+            profile=profile, eggs=eggs, cross_effects=cross_effects,
+            attribute_xml=attribute_xml, memories=recalled,
+            domain_constraint="",
+        )
+
+        # Inject room context into system prompt
+        if room_context:
+            system_prompt = system_prompt.replace(
+                "## 行为准则",
+                f"## 房间上下文\n{room_context}\n\n## 行为准则"
+            )
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+        ]
+
+        # Append recent conversation history
+        try:
+            recent = self._conversation_store.get_recent(session_id, 10)
+            for msg in recent:
+                if msg.get("role", "").startswith("character:"):
+                    # Show other characters' speech so this character can respond
+                    name = msg["role"].split(":", 1)[1]
+                    messages.append({"role": "system", "content": f"[{name}说] {msg['content']}"})
+                else:
+                    messages.append(msg)
+        except Exception:
+            pass
+
+        messages.append({"role": "user", "content": user_message})
+
+        return {
+            "messages": messages,
+            "active_easter_eggs": eggs,
+            "active_cross_effects": cross_effects,
+        }
+
     def _render_template(
         self,
         profile: MISSProfile,

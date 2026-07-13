@@ -58,6 +58,32 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public ICollectionView MessagesView => _messagesViewSource.View;
     public ObservableCollection<ChatMessage> Messages => _allMessages;
 
+    public ObservableCollection<RoleData> RoomRoles { get; } = new();
+
+    public bool IsRoomMode => RoomRoles.Count > 1;
+
+    public void AddRoleToRoom(RoleData role)
+    {
+        if (!RoomRoles.Any(r => r.Name == role.Name))
+        {
+            RoomRoles.Add(role);
+            OnPropertyChanged(nameof(IsRoomMode));
+            RefreshMessageFilter();
+        }
+    }
+
+    public void RemoveRoleFromRoom(RoleData role)
+    {
+        RoomRoles.Remove(role);
+        OnPropertyChanged(nameof(IsRoomMode));
+        RefreshMessageFilter();
+    }
+
+    public void RefreshMessageFilter()
+    {
+        _messagesViewSource.View.Refresh();
+    }
+
     public MainViewModel()
     {
         BindingOperations.EnableCollectionSynchronization(_allMessages, _lockObject);
@@ -66,6 +92,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _messagesViewSource.View.Filter = msg =>
         {
             if (msg is not ChatMessage m) return true;
+            if (IsRoomMode) return true;
             if (string.IsNullOrEmpty(_currentRole?.Name)) return true;
             return m.RoleName == _currentRole.Name;
         };

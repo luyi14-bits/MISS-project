@@ -1,6 +1,7 @@
 ﻿// Copyright (C) 2026  MISS Project Contributors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // This file is part of MISS <https://github.com/luyi14-bits/MISS-project>.
+using System.Linq;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -103,6 +104,18 @@ public partial class RoleSidebar : UserControl
         {
             NotificationService.Error($"导出失败：{ex.Message}");
         }
+    }
+
+    private void AddToRoom_Click(object sender, RoutedEventArgs e)
+    {
+        if (VM.CurrentRole is not RoleData role) return;
+        if (VM.RoomRoles.Any(r => r.Name == role.Name))
+        {
+            NotificationService.Info($"「{role.Name}」已在房间中");
+            return;
+        }
+        VM.AddRoleToRoom(role);
+        NotificationService.Info($"「{role.Name}」已加入房间");
     }
 
     private void DeleteRole_Click(object sender, RoutedEventArgs e)

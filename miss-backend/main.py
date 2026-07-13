@@ -120,11 +120,13 @@ async def api_info():
 
 from routers import chat, preset, admin, character
 from routers.settings import router as settings_router
+from routers.room import router as room_router
 app.include_router(chat.router, prefix="/api")
 app.include_router(preset.router, prefix="/api")
 app.include_router(admin.router, prefix="/api/admin")
 app.include_router(character.router, prefix="/api")
 app.include_router(settings_router, prefix="/api")
+app.include_router(room_router, prefix="/api")
 
 frontend_dir = os.path.join(os.path.dirname(__file__), "frontend")
 desktop_dir = os.environ.get("MISS_FRONTEND_DIR") or os.path.join(os.path.dirname(__file__), "frontend-desktop")

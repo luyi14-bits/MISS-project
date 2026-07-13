@@ -120,6 +120,70 @@ public static class PythonBridge
         return tokens.GetConsumingEnumerable();
     }
 
+    public class RoomCharProfile
+    {
+        public string Name { get; set; } = "";
+        public MISSProfile Profile { get; set; } = new();
+        public string Background { get; set; } = "";
+    }
+
+    public static List<Dictionary<string, object>> RoomChat(string sessionId, string message, List<RoomCharProfile> characters)
+    {
+        return RunOnPythonThread(() =>
+        {
+            dynamic pyList = new PyList();
+            foreach (var ch in characters)
+            {
+                dynamic pyDict = new PyDict();
+                pyDict["name"] = new PyString(ch.Name);
+                pyDict["profile"] = ProfileToDict(ch.Profile, null);
+                pyDict["background"] = new PyString(ch.Background ?? "");
+                pyList.append(pyDict);
+            }
+            dynamic result = _bridge.chat(sessionId, message, pyList);
+            dynamic json_module = Py.Import("json");
+            string jsonStr = json_module.dumps(result).ToString() ?? "[]";
+            return JsonSerializer.Deserialize<List<Dictionary<string, object>>>(jsonStr) ?? new();
+        });
+    }
+
+    public static IEnumerable<string> RoomChatStream(string sessionId, string message, List<RoomCharProfile> characters)
+    {
+        var tokens = new BlockingCollection<string>();
+        var responses = new Dictionary<string, string>();
+        _workQueue.Add(() =>
+        {
+            try
+            {
+                dynamic pyList = new PyList();
+                foreach (var ch in characters)
+                {
+                    dynamic pyDict = new PyDict();
+                    pyDict["name"] = new PyString(ch.Name);
+                    pyDict["profile"] = ProfileToDict(ch.Profile, null);
+                    pyDict["background"] = new PyString(ch.Background ?? "");
+                    pyList.append(pyDict);
+                }
+                dynamic gen = _bridge.chat_stream(sessionId, message, pyList);
+                foreach (var token in gen)
+                {
+                    string? s = token?.ToString();
+                    if (s != null) tokens.Add(s);
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError($"[RoomChatStream] {ex}");
+            }
+            finally { tokens.CompleteAdding(); }
+        });
+
+        foreach (var token in tokens.GetConsumingEnumerable())
+        {
+            yield return token;
+        }
+    }
+
     public static Dictionary<string, int> AnalyzeCharacter(string description)
     {
         return RunOnPythonThread(() =>

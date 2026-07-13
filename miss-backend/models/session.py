@@ -13,3 +13,5 @@ class Session(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     title = Column(String, default="新对话")
+    room_type = Column(String, default="single")  # "single" or "room"
+    room_roles = Column(String, default="[]")      # JSON list of role names, e.g. ["小恶魔","小天使"]
