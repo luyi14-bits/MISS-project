@@ -47,6 +47,13 @@ async def room_chat(request: Request, req: RoomChatRequest):
     if not req.characters:
         return {"error": "no_characters", "detail": "Room must have at least one character"}
 
+    # Validate each character has a valid name and profile
+    for ch in req.characters:
+        if not isinstance(ch.get("name"), str) or not ch.get("name"):
+            return {"error": "invalid_character", "detail": "Character must have a valid name"}
+        if not isinstance(ch.get("profile"), dict):
+            return {"error": "invalid_character", "detail": f"Character '{ch.get('name', '?')}' has invalid profile"}
+
     async def call_for_character(char: dict) -> dict:
         profile = MISSProfile(**char.get("profile", {}))
         background = char.get("background", "")

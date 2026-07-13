@@ -12,8 +12,8 @@
   var activePresetName = 'miss-default';
   var ctxTarget = null;
   var toastTimer = null;
-  var sessionId = localStorage.getItem('miss_session_id') || crypto.randomUUID();
-  localStorage.setItem('miss_session_id', sessionId);
+  var sessionId = sessionStorage.getItem('miss_session_id') || crypto.randomUUID();
+  sessionStorage.setItem('miss_session_id', sessionId);
 
   /* ── 启动加载流程 ── */
   var LOADING_INTERVAL = null;
@@ -106,7 +106,7 @@
 
   function addSession(){
     sessionId = crypto.randomUUID();
-    localStorage.setItem('miss_session_id', sessionId);
+    sessionStorage.setItem('miss_session_id', sessionId);
     document.getElementById('chatMsgs').innerHTML = '';
     var es = document.getElementById('emptyState');
     if(!es) {

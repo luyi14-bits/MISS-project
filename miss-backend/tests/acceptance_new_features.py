@@ -81,8 +81,8 @@ def run():
         for key in ["intimacy_change", "intimacy", "intimacy_reason"]:
             if key in data: P(f"/api/chat 含 {key}"); p += 1
             else: F(f"缺 {key}"); f += 1
-        if "_diag" in data: P("含 _diag 字段"); p += 1
-        else: F("缺 _diag"); f += 1
+        if "_diag" not in data: P("安全审计S03: _diag 已移除"); p += 1
+        else: F("_diag 字段仍存在，违反S03"); f += 1
 
         # ===== 4. KnowledgeFilter 三级过滤 =====
         print("\n── KnowledgeFilter 三级过滤 ──")
@@ -167,22 +167,6 @@ def run():
         if "chat_request_schema" in info: P("含 chat_request_schema"); p += 1
         else: F("缺 chat_request_schema"); f += 1
 
-        # ===== 11. _diag 调试信息 =====
-        print("\n── _diag 调试信息 ──")
-        r = client.post("/api/chat", json={"session_id":"s_d","message":"你好"})
-        diag = r.json().get("_diag", {})
-        if "key_ok" in diag: P("_diag含key_ok"); p += 1
-        else: F("缺key_ok"); f += 1
-        if "model" in diag: P("_diag含model"); p += 1
-        else: F("缺model"); f += 1
-        if "base_url" in diag: P("_diag含base_url"); p += 1
-        else: F("缺base_url"); f += 1
-        if "status" in diag: P("_diag含status"); p += 1
-        else: F("缺status"); f += 1
-        # settings 设置了假key → _has_valid_key()=True → 走 API 路径
-        if diag.get("status") in ("api_called", "api_error"):
-            P(f"_diag status={diag.get('status')} (走API路径)"); p += 1
-        else: F(f"status={diag.get('status')}"); f += 1
 
         # ===== 12. LLMCaller 懒加载 + base_url =====
         print("\n── LLMCaller 懒加载 + 自定义base_url ──")

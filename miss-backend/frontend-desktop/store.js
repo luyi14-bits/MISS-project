@@ -3,7 +3,7 @@
 
   window.getRoles = function(){
     try {
-      var raw = localStorage.getItem(STORAGE_KEY);
+      var raw = sessionStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
     } catch(e) { return []; }
   };
@@ -17,14 +17,14 @@
     } else {
       roles.push(entry);
     }
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(roles)); } catch(e){}
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(roles)); } catch(e){}
     return true;
   };
 
   window.deleteRole = function(name){
     var roles = getRoles();
     roles = roles.filter(function(r){ return r.name !== name; });
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(roles)); } catch(e){}
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(roles)); } catch(e){}
     return true;
   };
 
